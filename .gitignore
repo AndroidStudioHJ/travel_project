@@ -1,3 +1,11 @@
+# Python bytecode files
 __pycache__/
-.pyc 
-.env
+*.pyc
+
+# Other common Python temporary/generated files
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+env/
+*.egg-info/
