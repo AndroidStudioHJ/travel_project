@@ -1,74 +1,218 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}블로그 감성 분석{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .sentiment-container {
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .sentiment-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .sentiment-form {
+        max-width: 600px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: center;
+    }
+
+    .search-input-group {
+        display: flex;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        overflow: hidden;
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .search-input-group .form-control {
+        border: none;
+        box-shadow: none;
+        flex-grow: 1;
+        padding-left: 0.75rem;
+    }
+
+    .search-input-group .btn-primary {
+        border: none;
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+        padding: 0.375rem 0.75rem;
+        flex-shrink: 0;
+    }
+
+    .sentiment-form .input-group > .form-control:not(:first-child),
+    .sentiment-form .input-group > .btn:not(:first-child):not(:last-child) {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+    .sentiment-form .input-group > .btn:not(:last-child):not(:first-child) {
+         border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+     .sentiment-form .input-group > .form-control + .btn {
+         border-left: none;
+     }
+
+    .sentiment-results {
+        margin-top: 30px;
+    }
+
+    .sentiment-card {
+        margin-bottom: 20px;
+        border: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        width: 100%;
+    }
+
+    .sentiment-card .card-header {
+        font-weight: bold;
+        padding: 15px;
+        font-size: 1.1rem;
+    }
+
+    .sentiment-card .card-body {
+        padding: 25px;
+    }
+
+    .sentiment-stats {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 20px;
+        text-align: center;
+        flex-wrap: wrap;
+    }
+
+    .stat-item {
+        flex-grow: 1;
+        padding: 15px;
+        border-radius: 5px;
+        background-color: rgba(0,0,0,0.05);
+        min-width: 120px;
+        margin: 5px;
+    }
+
+    .stat-item h5 {
+        margin-bottom: 5px;
+        font-size: 1.1rem;
+    }
+
+    .stat-item p {
+        margin-bottom: 0;
+        font-size: 1.3rem;
+        font-weight: bold;
+    }
+
+    .sentiment-card .card-body h6 {
+        margin-bottom: 8px;
+        font-size: 1.05rem;
+    }
+
+    .sentiment-card .card-body a {
+        word-break: break-all;
+        font-size: 1rem;
+    }
+
+    .positive { color: #28a745; }
+    .negative { color: #dc3545; }
+    .neutral { color: #6c757d; }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="mb-4">네이버 블로그 감성 분석</h1>
-    
-    <form method="get" class="mb-4">
-        <div class="input-group">
-            <input type="text" name="query" class="form-control" placeholder="검색어를 입력하세요" value="{{ query|default:'' }}">
-            <button type="submit" class="btn btn-primary">분석하기</button>
+    <div class="sentiment-container">
+        <div class="sentiment-header">
+            <h1 class="mb-4">네이버 블로그 감성 분석</h1>
         </div>
-    </form>
-
-    {% if query %}
-        <div class="card mb-4">
-            <div class="card-body">
-                <h5 class="card-title">분석 결과</h5>
-                <p>전체 후기 수: {{ total_count }}개</p>
-                <p>긍정 후기 수: {{ positive_count }}개</p>
-                <p>부정 후기 수: {{ negative_count }}개</p>
-                <p>중립 후기 수: {{ neutral_count }}개</p>
+        
+        <form method="get" class="sentiment-form">
+            <div class="input-group search-input-group">
+                <input type="text" name="query" class="form-control" placeholder="검색어를 입력하세요" value="{{ query|default:'' }}">
+                <button type="submit" class="btn btn-primary">분석하기</button>
             </div>
-        </div>
+        </form>
 
-        {% if positive_posts %}
-            <div class="card mb-4">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">긍정 후기 상위 5개</h5>
+        {% if query %}
+            <div class="sentiment-results">
+                <div class="sentiment-stats">
+                    <div class="stat-item">
+                        <h5>전체 후기</h5>
+                        <p>{{ total_count }}개</p>
+                    </div>
+                    <div class="stat-item positive">
+                        <h5>긍정 후기</h5>
+                        <p>{{ positive_count }}개</p>
+                    </div>
+                    <div class="stat-item negative">
+                        <h5>부정 후기</h5>
+                        <p>{{ negative_count }}개</p>
+                    </div>
+                    <div class="stat-item neutral">
+                        <h5>중립 후기</h5>
+                        <p>{{ neutral_count }}개</p>
+                    </div>
                 </div>
-                <div class="card-body">
-                    {% for post in positive_posts %}
-                        <div class="mb-3">
-                            <h6>{{ post.date }} | {{ post.title }}</h6>
-                            <a href="{{ post.link }}" target="_blank" class="text-decoration-none">{{ post.link }}</a>
+
+                {% if positive_posts %}
+                    <div class="card sentiment-card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">긍정 후기 상위 5개</h5>
                         </div>
-                    {% endfor %}
-                </div>
+                        <div class="card-body">
+                            {% for post in positive_posts %}
+                                <div class="mb-3">
+                                    <h6>{{ post.date }} | {{ post.title }}</h6>
+                                    <a href="{{ post.link }}" target="_blank" class="text-decoration-none">{{ post.link }}</a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if negative_posts %}
+                    <div class="card sentiment-card">
+                        <div class="card-header bg-danger text-white">
+                            <h5 class="mb-0">부정 후기 상위 5개</h5>
+                        </div>
+                        <div class="card-body">
+                            {% for post in negative_posts %}
+                                <div class="mb-3">
+                                    <h6>{{ post.date }} | {{ post.title }}</h6>
+                                    <a href="{{ post.link }}" target="_blank" class="text-decoration-none">{{ post.link }}</a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if neutral_posts %}
+                    <div class="card sentiment-card">
+                        <div class="card-header bg-secondary text-white">
+                            <h5 class="mb-0">중립 후기 상위 5개</h5>
+                        </div>
+                        <div class="card-body">
+                            {% for post in neutral_posts %}
+                                <div class="mb-3">
+                                    <h6>{{ post.date }} | {{ post.title }}</h6>
+                                    <a href="{{ post.link }}" target="_blank" class="text-decoration-none">{{ post.link }}</a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
             </div>
         {% endif %}
-
-        {% if negative_posts %}
-            <div class="card mb-4">
-                <div class="card-header bg-danger text-white">
-                    <h5 class="mb-0">부정 후기 상위 5개</h5>
-                </div>
-                <div class="card-body">
-                    {% for post in negative_posts %}
-                        <div class="mb-3">
-                            <h6>{{ post.date }} | {{ post.title }}</h6>
-                            <a href="{{ post.link }}" target="_blank" class="text-decoration-none">{{ post.link }}</a>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        {% endif %}
-
-        {% if neutral_posts %}
-            <div class="card mb-4">
-                <div class="card-header bg-secondary text-white">
-                    <h5 class="mb-0">중립 후기 상위 5개</h5>
-                </div>
-                <div class="card-body">
-                    {% for post in neutral_posts %}
-                        <div class="mb-3">
-                            <h6>{{ post.date }} | {{ post.title }}</h6>
-                            <a href="{{ post.link }}" target="_blank" class="text-decoration-none">{{ post.link }}</a>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        {% endif %}
-    {% endif %}
+    </div>
 </div>
 {% endblock %} 

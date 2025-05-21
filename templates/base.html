@@ -1,5 +1,4 @@
 {% load static %}
-<<<<<<< HEAD
 <!-- templates/base.html -->
 <!DOCTYPE html>
 <html lang="ko">
@@ -219,15 +218,15 @@
         <div class="nav-links">
             <a href="{% url 'home' %}">홈</a>
             <div class="dropdown">
-                <a href="{% url 'travel_input:travel_list' %}">여행 정보</a>
+                <a href="{% url 'travel_input:schedule_list' %}">여행 정보</a>
                 <div class="dropdown-content">
                     <div class="row">
-                        <a href="{% url 'travel_input:travel_list' %}">여행지 목록</a>
-                        <a href="{% url 'travel_input:travel_create' %}">여행지 등록</a>
+                        <a href="{% url 'travel_input:schedule_list' %}">여행지 목록</a>
+                        <a href="{% url 'travel_input:schedule_create' %}">여행지 등록</a>
                     </div>
                 </div>
             </div>
-            <a href="{% url 'map:map_view' %}">지도</a>
+            <a href="{% url 'travel:map' %}">지도</a>
             <a href="{% url 'blog:sentiment_analysis' %}">블로그 감성 분석</a>
         </div>
 
@@ -261,202 +260,4 @@
     {% endblock %}
 </body>
 
-=======
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  {% block extra_head %}
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}모두투어 - 국내 여행 정보{% endblock %}</title>
-  <link rel="icon" href="{% static 'images/modetour_icon1.ico' %}" type="image/x-icon">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/ubuntu/0.0.1/ubuntu.css" rel="stylesheet">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-  {% endblock %}
-
-  {% block extra_css %}
-  <style>
-    :root {
-      --font-family: "Noto Sans KR", sans-serif;
-      --font-weight-regular: 400;
-    }
-
-    body {
-      font-family: var(--font-family);
-      font-weight: var(--font-weight-regular);
-      background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-                  url('{% static "images/풍경사진_낮.jfif" %}') no-repeat center center fixed;
-      background-size: cover;
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      animation: fadeIn 0.6s ease;
-      overflow-x: hidden;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.5));
-      z-index: -1;
-    }
-
-    .nav-bar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 9999;
-      background-color: #007acc;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 40px;
-      height: 60px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 30px;
-      align-items: center;
-      height: 100%;
-    }
-
-    .nav-links a {
-      text-decoration: none;
-      color: white;
-      font-size: 1rem;
-      padding: 0 12px;
-      display: flex;
-      align-items: center;
-      transition: all 0.3s ease;
-    }
-
-    .nav-links a:hover {
-      color: #ffd700;
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-
-    .nav-user {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .nav-user span {
-      font-size: 0.9rem;
-      color: #ffd700;
-    }
-
-    .login-btn, .logout-btn {
-      background-color: transparent;
-      color: white;
-      padding: 8px 16px;
-      font-size: 0.9rem;
-      border: 1px solid white;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-    }
-
-    .login-btn:hover, .logout-btn:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-
-    .content {
-      flex: 1;
-      width: 100%;
-      max-width: 1300px;
-      margin: 0 auto;
-      padding: 100px 20px 40px;  /* padding-top 충분히 주기 */
-    }
-
-    footer {
-      flex-shrink: 0;
-      background-color: #007acc;
-      color: white;
-      text-align: center;
-      padding: 15px 0;
-      font-size: 0.9rem;
-      width: 100%;
-    }
-
-    .toast {
-      position: fixed;
-      top: 80px;
-      right: 20px;
-      z-index: 9999;
-      background: #007acc;
-      color: white;
-      padding: 12px 20px;
-      border-radius: 6px;
-      margin-bottom: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-  </style>
-  {% endblock %}
-</head>
-
-<body>
-  <div class="nav-bar">
-    <div class="nav-links">
-      <a href="{% url 'home' %}">홈</a>
-      <a href="{% url 'travel_input:schedule_list' %}">일정</a>
-      <a href="{% url 'travel_input:generate_dummy' %}">더미 생성</a>
-      <a href="{% url 'travel_input:travel_ai_consult' %}">AI 일정 추천</a>
-      <a href="{% url 'travel_input:travel_survey' %}">여행 설문</a>
-    </div>
-
-    {% if user.is_authenticated %}
-    <div class="nav-user">
-      <span>{{ user.username }}님</span>
-      <form action="{% url 'accounts:logout' %}" method="post" style="margin: 0;">
-        {% csrf_token %}
-        <button type="submit" class="logout-btn">로그아웃</button>
-      </form>
-    </div>
-    {% else %}
-    <div class="nav-user">
-      <a href="{% url 'accounts:login' %}" class="login-btn">로그인</a>
-      <a href="{% url 'accounts:register' %}" class="login-btn">회원가입</a>
-    </div>
-    {% endif %}
-  </div>
-
-  {% if messages %}
-  <div>
-    {% for message in messages %}
-      <div class="toast">{{ message }}</div>
-    {% endfor %}
-  </div>
-  {% endif %}
-
-  <div class="content">
-    {% block content %}{% endblock %}
-  </div>
-
-  <footer>
-    <p style="margin: 0;">© 2025 모두투어 - All Rights Reserved</p>
-  </footer>
-
-  {% block extra_js %}
-  <script></script>
-  {% endblock %}
-</body>
->>>>>>> ef6c3be (새롭게 시작)
 </html>
