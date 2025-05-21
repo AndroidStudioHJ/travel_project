@@ -219,6 +219,7 @@
             <a href="{% url 'home' %}">홈</a>
             <a href="{% url 'travel_input:schedule_list' %}">일정</a>
             <a href="{% url 'travel_input:generate_dummy' %}">더미 생성</a>
+            <a href="{% url 'blog_search:search' %}">블로그 검색</a>
         </div>
 
         {% if user.is_authenticated %}
