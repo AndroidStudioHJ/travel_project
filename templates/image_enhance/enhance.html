@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}이미지 개선 | 모두투어{% endblock %}
+
+{% block content %}
+<div style="display: flex; gap: 40px; align-items: flex-start; justify-content: center; margin-top: 40px; background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.04); padding: 40px 0;">
+    <!-- 왼쪽 영역: 이미지 업로드 -->
+    <div style="flex: 1; min-width: 320px; max-width: 400px;">
+        <h2>이미지 업로드</h2>
+        <div id="drop-area" style="border: 2px dashed #007acc; border-radius: 8px; padding: 40px 20px; text-align: center; background: #f8fafc; cursor: pointer; margin-bottom: 20px;">
+            <i class="fas fa-cloud-upload-alt fa-3x mb-3" style="color: #007acc;"></i>
+            <p>여기로 이미지를 드래그 앤 드롭하거나 클릭하여 업로드하세요.</p>
+            <p style="color: #666; font-size: 0.9em;">지원 형식: JPG, PNG</p>
+            <input type="file" id="imageInput" accept="image/*" style="display: none;">
+        </div>
+        <div id="originalPreview" style="display: none; margin-bottom: 20px;">
+            <h5>원본 이미지</h5>
+            <img src="#" alt="원본 이미지" style="width: 100%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        </div>
+        <button id="enhanceButton" style="width: 100%; background: #007acc; color: white; border: none; border-radius: 4px; padding: 12px 0; font-size: 1.1rem; cursor: pointer; transition: all 0.3s ease; margin-top: 20px;" disabled>
+            <i class="fas fa-magic"></i> 실행
+        </button>
+        <!-- 디버깅 정보 표시 영역 추가 -->
+        <div id="debugInfo" style="margin-top: 20px; padding: 10px; background: #f8f9fa; border-radius: 4px; font-size: 0.9em; color: #666;">
+            <h6>디버깅 정보:</h6>
+            <pre id="debugOutput" style="margin: 0; white-space: pre-wrap;"></pre>
+        </div>
+    </div>
+
+    <!-- 오른쪽 영역: 개선된 이미지 -->
+    <div style="flex: 1; min-width: 320px; max-width: 400px;">
+        <h2>개선된 이미지</h2>
+        <div id="enhancedPreview" style="min-height: 300px; background: #f8fafc; border: 1px solid #e0e0e0; border-radius: 8px; display: flex; align-items: center; justify-content: center; position: relative;">
+            <div id="loadingSpinner" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p style="margin-top: 10px; color: #007acc;">이미지 개선 중...</p>
+            </div>
+            <p style="color: #666; text-align: center;">개선된 이미지가 여기에 표시됩니다</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dropArea = document.getElementById('drop-area');
+    const imageInput = document.getElementById('imageInput');
+    const originalPreview = document.getElementById('originalPreview');
+    const enhancedPreview = document.getElementById('enhancedPreview');
+    const enhanceButton = document.getElementById('enhanceButton');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const debugOutput = document.getElementById('debugOutput');
+    let currentFile = null; // 현재 선택된 파일을 저장할 변수
+
+    // 디버깅 로그 함수
+    function debugLog(message) {
+        const timestamp = new Date().toLocaleTimeString();
+        debugOutput.innerHTML += `[${timestamp}] ${message}\n`;
+        console.log(`[${timestamp}] ${message}`);
+    }
+
+    // Drag and drop handlers
+    dropArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropArea.style.borderColor = '#28a745';
+        dropArea.style.backgroundColor = '#e9ecef';
+        debugLog('드래그 오버 이벤트 발생');
+    });
+
+    dropArea.addEventListener('dragleave', () => {
+        dropArea.style.borderColor = '#007acc';
+        dropArea.style.backgroundColor = '#f8fafc';
+        debugLog('드래그 리브 이벤트 발생');
+    });
+
+    dropArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropArea.style.borderColor = '#007acc';
+        dropArea.style.backgroundColor = '#f8fafc';
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            debugLog(`파일 드롭됨: ${files[0].name} (${files[0].type})`);
+            handleImageUpload(files[0]);
+        }
+    });
+
+    dropArea.addEventListener('click', () => {
+        imageInput.click();
+        debugLog('업로드 영역 클릭됨');
+    });
+
+    imageInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            debugLog(`파일 선택됨: ${e.target.files[0].name} (${e.target.files[0].type})`);
+            handleImageUpload(e.target.files[0]);
+        }
+    });
+
+    function handleImageUpload(file) {
+        if (!file.type.startsWith('image/')) {
+            debugLog('오류: 이미지 파일이 아님');
+            alert('이미지 파일만 업로드 가능합니다.');
+            return;
+        }
+
+        debugLog(`이미지 업로드 처리 시작: ${file.name}`);
+        currentFile = file; // 현재 파일 저장
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            originalPreview.querySelector('img').src = e.target.result;
+            originalPreview.style.display = 'block';
+            enhanceButton.disabled = false;
+            enhanceButton.style.opacity = '1';
+            debugLog('이미지 미리보기 표시됨');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    enhanceButton.addEventListener('click', async () => {
+        if (!currentFile) {
+            debugLog('오류: 이미지 파일이 없음');
+            return;
+        }
+
+        debugLog('이미지 개선 시작');
+        // Show loading spinner
+        loadingSpinner.style.display = 'block';
+        enhanceButton.disabled = true;
+        enhanceButton.style.backgroundColor = '#005999';
+        enhanceButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 처리 중...';
+
+        const formData = new FormData();
+        formData.append('image', currentFile);
+        debugLog('FormData 생성됨');
+
+        try {
+            debugLog('서버 요청 시작');
+            const response = await fetch('/image_enhance/process/', {
+                method: 'POST',
+                body: formData
+            });
+            debugLog(`서버 응답 상태: ${response.status}`);
+
+            const data = await response.json();
+            debugLog(`서버 응답 데이터: ${JSON.stringify(data)}`);
+
+            if (data.success) {
+                debugLog('이미지 개선 성공');
+                enhancedPreview.innerHTML = `
+                    <img src="${data.output_url}" alt="개선된 이미지" style="width: 100%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                `;
+            } else {
+                debugLog(`이미지 개선 실패: ${data.error}`);
+                alert('이미지 처리 중 오류가 발생했습니다: ' + data.error);
+            }
+        } catch (error) {
+            debugLog(`오류 발생: ${error.message}`);
+            alert('서버 통신 중 오류가 발생했습니다.');
+            console.error('Error:', error);
+        } finally {
+            debugLog('처리 완료');
+            loadingSpinner.style.display = 'none';
+            enhanceButton.disabled = false;
+            enhanceButton.style.backgroundColor = '#007acc';
+            enhanceButton.innerHTML = '<i class="fas fa-magic"></i> 실행';
+        }
+    });
+});
+</script>
+{% endblock %}

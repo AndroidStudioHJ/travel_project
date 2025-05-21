@@ -18,7 +18,7 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/pretendard/1.2.1/static/pretendard.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 {% endblock %}
-{% block title %}모두투어 - 국내 여행 정보{% endblock %}
+{% block title %}홈 - 여행 기록{% endblock %}
 {% block extra_css %}
 {{ block.super }}
 <style>
@@ -567,179 +567,43 @@
 </style>
 {% endblock %}
 {% block content %}
-<div class="hero-section animate__animated animate__fadeIn">
-    <h1>당신의 완벽한 여행을 설계하세요</h1>
-    <p>복잡한 여행 계획도 모두투어와 함께라면 쉽고 즐겁게! 전문가의 조언과 함께 나만의 특별한 여행 일정을 만들어보세요.</p>
-</div>
-
-<div class="features-container">
-    <div class="features-grid">
-        <a href="{% url 'travel_input:smart_schedule' %}" class="feature-card animate__animated animate__fadeInUp">
-            <div class="feature-icon">🎯</div>
-            <h2 class="feature-title">스마트 일정 관리</h2>
-            <p class="feature-description">날짜별로 체계적인 여행 일정을 쉽게 관리하고, AI 기반 추천 일정으로 더 특별한 여행을 계획하세요.</p>
-            <span class="feature-link">일정 만들기</span>
-        </a>
-
-        <a href="{% url 'travel_input:recommendations' %}" class="feature-card animate__animated animate__fadeInUp animate__delay-1s">
-            <div class="feature-icon">🏖️</div>
-            <h2 class="feature-title">맞춤형 장소 추천</h2>
-            <p class="feature-description">선호하는 여행 스타일과 관심사에 맞는 최적의 관광지, 맛집, 숙소를 추천해드립니다.</p>
-            <span class="feature-link">추천 보기</span>
-        </a>
-
-        <a href="{% url 'travel_input:budget_planning' %}" class="feature-card animate__animated animate__fadeInUp animate__delay-2s">
-            <div class="feature-icon">💰</div>
-            <h2 class="feature-title">예산 계획</h2>
-            <p class="feature-description">예산 범위 내에서 최적의 여행 계획을 세우고, 실시간 경비 관리로 알뜰한 여행을 즐기세요.</p>
-            <span class="feature-link">계획 세우기</span>
-        </a>
-    </div>
-</div>
-
-<div class="cta-section animate__animated animate__fadeIn">
-    <h2>지금 바로 여행 계획 시작하기</h2>
-    <p>5분 만에 나만의 맞춤형 여행 일정 만들기! 전문가의 조언과 함께 더 특별한 여행을 계획하세요.</p>
-    <a href="{% url 'travel_input:schedule_create' %}" class="cta-button">일정 만들기</a>
-</div>
-
-<table border="1" cellpadding="10" cellspacing="0">
-    <thead>
-        <tr style="background-color: #f0f0f0;">
-            <th>구역</th>
-            <th>상태</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td><strong>Schedule (일정)</strong></td>
-            <td>기본 정보 입력 중</td>
-        </tr>
-        <tr>
-            <td><strong>Budgets (예산)</strong></td>
-            <td>항목 & 금액 입력 가능</td>
-        </tr>
-        <tr>
-            <td><strong>Participants (인원)</strong></td>
-            <td>이름 & 나이 입력</td>
-        </tr>
-        <tr>
-            <td><strong>Places (방문 장소)</strong></td>
-            <td>이름 & 날짜, 달력도 Good</td>
-        </tr>
-        <tr>
-            <td><strong>Transports (교통)</strong></td>
-            <td>유형/출발지/도착지/시간까지 한큐에 입력!</td>
-        </tr>
-    </tbody>
-</table>
-
-<!-- Tab Navigation -->
-<div class="tabs">
-    <div id="tab1" onclick="switchTab(1)" class="active">국내 여행 정보</div>
-    <div id="tab2" onclick="switchTab(2)">국내 여행 추천지</div>
-</div>
-
-<!-- Tab Content -->
-<div id="content1" class="tab-content active-tab">
-    <div class="info-section">
-        <div class="info-header">
-            <h2>알찬 국내 여행의 모든 것</h2>
-            <p>여행의 시작부터 끝까지, 모두투어가 함께합니다. 전국 각지의 숨은 명소부터 인기 관광지까지, 당신의 특별한 여행을 위한 모든 정보를 제공합니다.</p>
-        </div>
-        <div class="info-grid">
-            <div class="info-card">
-                <h3><i class="fas fa-map-marker-alt"></i> 지역별 추천 코스</h3>
-                <p>각 지역의 특색 있는 여행 코스를 소개합니다.</p>
-                <ul>
-                    <li>서울 - 고궁, 남산타워, 한강공원 데이트 코스</li>
-                    <li>부산 - 해운대, 광안리, 감천문화마을 투어</li>
-                    <li>제주 - 올레길, 오름, 카페 탐방 코스</li>
-                    <li>강원 - 설악산, 속초 해변, 강릉 커피거리</li>
-                </ul>
-                <a href="#" class="info-link">자세히 보기 →</a>
-            </div>
-            <div class="info-card">
-                <h3><i class="fas fa-utensils"></i> 맛집 & 카페</h3>
-                <p>현지인이 추천하는 숨은 맛집 정보를 알려드립니다.</p>
-                <ul>
-                    <li>지역별 대표 음식과 맛집 리스트</li>
-                    <li>인스타그램 핫플레이스 카페</li>
-                    <li>미쉐린 가이드 선정 맛집</li>
-                    <li>전통시장 먹거리 투어</li>
-                </ul>
-                <a href="#" class="info-link">맛집 찾기 →</a>
-            </div>
-            <div class="info-card">
-                <h3><i class="fas fa-bed"></i> 숙소 정보</h3>
-                <p>목적에 맞는 최적의 숙소를 찾아보세요.</p>
-                <ul>
-                    <li>호텔/리조트 특가 정보</li>
-                    <li>아늑한 펜션 & 풀빌라</li>
-                    <li>이색적인 글램핑 & 캠핑장</li>
-                    <li>한옥 스테이 체험</li>
-                </ul>
-                <a href="#" class="info-link">숙소 검색 →</a>
-            </div>
-            <div class="info-card">
-                <h3><i class="fas fa-calendar-check"></i> 시기별 추천</h3>
-                <p>계절과 시기에 따른 최적의 여행지를 추천합니다.</p>
-                <ul>
-                    <li>봄 - 벚꽃 명소와 봄꽃 축제</li>
-                    <li>여름 - 해수욕장과 계곡</li>
-                    <li>가을 - 단풍 명소와 억새 군락지</li>
-                    <li>겨울 - 스키장과 겨울 축제</li>
-                </ul>
-                <a href="#" class="info-link">시기별 보기 →</a>
-            </div>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <h1 class="display-4 mb-4">여행 기록에 오신 것을 환영합니다</h1>
+            <p class="lead">당신의 소중한 여행 순간을 기록하고 공유하세요.</p>
         </div>
     </div>
-</div>
 
-<div id="content2" class="tab-content">
-    <h2 class="category-title">국내 여행 추천지</h2>
-    <div class="category-list">
-        <div class="category-item">
-            <img src="{% static 'images/서울_롯데타워_야경.jpg' %}" alt="서울">
-            <div class="content-wrapper">
-                <h4>서울 여행</h4>
-                <p>서울에서 즐길 수 있는 다양한 활동들을 만나보세요. 쇼핑, 문화, 음식 등 서울만의 매력을 소개합니다.</p>
-                <a href="#" class="booking-button" target="_blank">서울 숙박 예약</a>
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-map-marked-alt fa-3x mb-3 text-primary"></i>
+                    <h3>여행 지도</h3>
+                    <p>방문한 장소를 지도에 표시하고 기록하세요.</p>
+                    <a href="{% url 'travel:map' %}" class="btn btn-primary">지도 보기</a>
+                </div>
             </div>
         </div>
-        <div class="category-item">
-            <img src="{% static 'images/경기도_바다사진_야경_푸른색계열.png' %}" alt="경기도">
-            <div class="content-wrapper">
-                <h4>경기도 여행</h4>
-                <p>경기도는 서울 근교의 다양한 자연과 관광지를 자랑합니다. 서울 근처에서 즐길 수 있는 산과 호수, 그리고 놀이공원이 있습니다.</p>
-                <a href="https://www.booking.com/city/kr/gyeonggi-do.ko.html" class="booking-button" target="_blank">경기도 숙박
-                    예약</a>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-image fa-3x mb-3 text-success"></i>
+                    <h3>이미지 개선</h3>
+                    <p>여행 사진을 더 선명하고 아름답게 만들어보세요.</p>
+                    <a href="{% url 'image_enhance:enhance' %}" class="btn btn-success">이미지 개선</a>
+                </div>
             </div>
         </div>
-        <div class="category-item">
-            <img src="{% static 'images/부산_대교_야경_보라색계열.jfif' %}" alt="부산">
-            <div class="content-wrapper">
-                <h4>부산 여행</h4>
-                <p>부산의 해운대, 광안리, 국제시장 등 부산의 다양한 명소를 만나볼 수 있습니다.</p>
-                <a href="https://www.booking.com/city/kr/busan.ko.html" class="booking-button" target="_blank">부산 숙박 예약</a>
-            </div>
-        </div>
-        <div class="category-item">
-            <img src="{% static 'images/강원도_야경_명소_야경_남색계열.jpg' %}" alt="강원도">
-            <div class="content-wrapper">
-                <h4>강원도 여행</h4>
-                <p>강원도의 아름다운 자연, 산과 바다를 즐길 수 있는 다양한 여행지 정보를 제공합니다.</p>
-                <a href="https://www.booking.com/city/kr/gangwon-do.ko.html" class="booking-button" target="_blank">강원도 숙박
-                    예약</a>
-            </div>
-        </div>
-        <div class="category-item">
-            <img src="{% static 'images/전남광주_대표_관광지_야경_노란색이섞인_푸른색계열.jpg' %}" alt="전라남도">
-            <div class="content-wrapper">
-                <h4>전라남도 여행</h4>
-                <p>전라남도의 아름다운 해변과 자연, 문화유산을 즐길 수 있는 여행지입니다.</p>
-                <a href="https://www.booking.com/city/kr/jeollanam-do.ko.html" class="booking-button" target="_blank">전라남도
-                    숙박 예약</a>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-blog fa-3x mb-3 text-info"></i>
+                    <h3>블로그 감성 분석</h3>
+                    <p>여행 블로그의 감성을 분석해보세요.</p>
+                    <a href="{% url 'blog:sentiment_analysis' %}" class="btn btn-info">감성 분석</a>
+                </div>
             </div>
         </div>
     </div>

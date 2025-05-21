@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.contrib.auth.views import LoginView, LogoutView
 from django.views.generic import CreateView
 from django.urls import reverse_lazy
-from .forms import CustomUserCreationForm, CustomAuthenticationForm
+from .forms import CustomUserCreationForm, CustomAuthenticationForm, UserProfileForm
 from .models import CustomUser
 
 # 로그인 뷰
@@ -28,7 +28,20 @@ class UserRegisterView(CreateView):
 
 # 홈 페이지 뷰
 def home(request):
-    return render(request, 'home.html')  # templates/home.html 경로
+    return render(request, 'home.html')
+
+@login_required
+def profile(request):
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, request.FILES, instance=request.user.profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, '프로필이 업데이트되었습니다.')
+            return redirect('accounts:profile')
+    else:
+        form = UserProfileForm(instance=request.user.profile)
+    
+    return render(request, 'accounts/profile.html', {'form': form})
 
 # 문화 정보 페이지 뷰 추가
 def culture(request):
