@@ -21,6 +21,17 @@
     color: #007acc;
     margin-bottom: 35px;
   }
+<<<<<<< HEAD
+=======
+  .section-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #007acc;
+    border-bottom: 2px solid #007acc;
+    margin: 30px 0 20px;
+    padding-bottom: 8px;
+  }
+>>>>>>> ef6c3be (새롭게 시작)
   .form-group {
     margin-bottom: 25px;
   }
@@ -40,6 +51,7 @@
   .checkbox-item {
     display: flex;
     align-items: center;
+<<<<<<< HEAD
     gap: 6px;
     white-space: nowrap;
   }
@@ -50,6 +62,20 @@
     white-space: nowrap;
   }
   input, select {
+=======
+    gap: 5px;
+  }
+  .checkbox-item input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    padding: 0;
+  }
+  .checkbox-item label {
+    margin: 0;
+    font-weight: normal;
+  }
+  input, select, textarea {
+>>>>>>> ef6c3be (새롭게 시작)
     width: 100%;
     padding: 12px 14px;
     border: 1px solid #ccc;
@@ -57,6 +83,14 @@
     font-size: 1rem;
     background: #fdfdfd;
   }
+<<<<<<< HEAD
+=======
+  input:focus, select:focus, textarea:focus {
+    border-color: #007acc;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 122, 204, 0.3);
+  }
+>>>>>>> ef6c3be (새롭게 시작)
   .form-actions {
     margin-top: 40px;
     text-align: center;
@@ -73,16 +107,106 @@
     background-color: #007acc;
     color: white;
   }
+<<<<<<< HEAD
+=======
+  .btn-primary:hover {
+    background-color: #0064b1;
+  }
+>>>>>>> ef6c3be (새롭게 시작)
   .btn-secondary {
     background-color: #6c757d;
     color: white;
     margin-left: 12px;
   }
+<<<<<<< HEAD
+=======
+  .btn-secondary:hover {
+    background-color: #5a6268;
+  }
+>>>>>>> ef6c3be (새롭게 시작)
   .error {
     color: #dc3545;
     font-size: 0.9rem;
     margin-top: 5px;
   }
+<<<<<<< HEAD
+=======
+  small, .info-message {
+    display: block;
+    margin-top: 5px;
+    color: #666;
+    font-size: 0.9rem;
+  }
+  .form-section {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  .form-section h3 {
+    color: #007acc;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .form-section h3 i {
+    font-size: 1.3rem;
+  }
+  .form-group {
+    margin-bottom: 20px;
+  }
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 500;
+  }
+  .form-group input[type="text"],
+  .form-group input[type="number"],
+  .form-group input[type="date"],
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+  }
+  .form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+  .checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 10px;
+  }
+  .checkbox-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 15px;
+    background: #f8f9fa;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .checkbox-option:hover {
+    background: #e9ecef;
+  }
+  .checkbox-option input[type="checkbox"] {
+    margin: 0;
+  }
+  .help-text {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 5px;
+  }
+>>>>>>> ef6c3be (새롭게 시작)
 </style>
 {% endblock %}
 
@@ -92,6 +216,7 @@
   <form method="post">
     {% csrf_token %}
 
+<<<<<<< HEAD
     <!-- 일정 제목 -->
     <div class="form-group">
       <label class="form-label" for="{{ form.title.id_for_label }}">일정 제목</label>
@@ -160,10 +285,57 @@
     </div>
 
     <!-- 저장 버튼 -->
+=======
+    {% for field in form %}
+      {% if field.field.widget.input_type == "checkbox" %}
+        <div class="form-group" style="margin-bottom: 25px;">
+          <label for="{{ field.id_for_label }}" style="display: flex; align-items: center; gap: 8px; font-weight: 500;">
+            <span style="margin-right: 6px;">{{ field.label }}</span>
+            {{ field }}
+          </label>
+          {% if field.errors %}<div class="error">{{ field.errors }}</div>{% endif %}
+        </div>
+      {% elif field.name in 'travel_style important_factors' %}
+        <div class="form-group">
+          <label class="form-label">{{ field.label }}</label>
+          <div class="checkbox-wrapper" style="display: flex; flex-wrap: wrap; gap: 15px;">
+            {% for checkbox in field %}
+              <label class="checkbox-item" style="display: flex; align-items: center; gap: 6px;">
+                <span style="margin-right: 4px;">{{ checkbox.choice_label }}</span>
+                {{ checkbox.tag }}
+              </label>
+            {% endfor %}
+          </div>
+          {% if field.errors %}<div class="error">{{ field.errors }}</div>{% endif %}
+        </div>
+      {% elif field.name in 'lodging_request people_composition pet_friendly' %}
+        <div class="form-group">
+          <label class="form-label">{{ field.label }}</label>
+          {{ field }}
+          {% if field.name == 'lodging_request' %}<small>예: 바닷가 근처, 조용한 곳</small>{% endif %}
+          {% if field.name == 'people_composition' %}<small>예: 가족, 친구, 연인</small>{% endif %}
+          {% if field.errors %}<div class="error">{{ field.errors }}</div>{% endif %}
+        </div>
+      {% else %}
+        <div class="form-group">
+          <label class="form-label">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}<div class="error">{{ field.errors }}</div>{% endif %}
+        </div>
+      {% endif %}
+    {% endfor %}
+
+    {{ participant_formset.management_form }}
+
+>>>>>>> ef6c3be (새롭게 시작)
     <div class="form-actions">
       <button type="submit" class="btn btn-primary">저장</button>
       <a href="{% url 'travel_input:schedule_list' %}" class="btn btn-secondary">취소</a>
     </div>
   </form>
 </div>
+<<<<<<< HEAD
 {% endblock %}
+=======
+{% endblock %}
+>>>>>>> ef6c3be (새롭게 시작)

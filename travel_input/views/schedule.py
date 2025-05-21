@@ -2,15 +2,23 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
+<<<<<<< HEAD
 from datetime import date, timedelta
 import random
 from faker import Faker
 from openai import OpenAI
 from django.conf import settings
+=======
+from datetime import date, timedelta, datetime
+import random
+from faker import Faker
+import openai
+>>>>>>> ef6c3be (새롭게 시작)
 
 from travel_input.forms import ScheduleForm
 from travel_input.models import Schedule, Destination
 
+<<<<<<< HEAD
 @login_required
 def schedule_create(request):
     if request.method == 'POST':
@@ -72,6 +80,23 @@ def schedule_create(request):
 
     return render(request, 'travel_input/schedule_form.html', {'form': form})
 
+=======
+STYLE_LABELS = {
+    'nature': '자연경관',
+    'city': '도시 탐방',
+    'culture': '문화 체험',
+    'activity': '액티비티',
+    'relax': '휴식과 힐링',
+}
+
+FACTOR_LABELS = {
+    'stay': '숙소',
+    'food': '음식',
+    'weather': '날씨',
+    'schedule': '일정',
+    'culture': '문화',
+}
+>>>>>>> ef6c3be (새롭게 시작)
 
 
 @login_required
@@ -95,6 +120,7 @@ def schedule_list(request):
 @login_required
 def schedule_detail(request, pk):
     schedule = get_object_or_404(Schedule, pk=pk, user=request.user)
+<<<<<<< HEAD
     ai_answer = None
 
     if request.method == 'POST':
@@ -161,6 +187,34 @@ def schedule_detail(request, pk):
 
 
 # 나머지 기능들은 기존 그대로 유지
+=======
+    schedule_event = {
+        'title': schedule.title,
+        'start': schedule.start_date.isoformat() if schedule.start_date else None,
+        'end': schedule.end_date.isoformat() if schedule.end_date else None,
+        'url': '',
+    }
+    return render(request, 'travel_input/schedule_detail.html', {
+        'schedule': schedule,
+        'schedule_event': schedule_event,
+    })
+
+
+@login_required
+def schedule_create(request):
+    if request.method == 'POST':
+        form = ScheduleForm(request.POST)
+        if form.is_valid():
+            schedule = form.save(commit=False)
+            schedule.user = request.user
+            schedule.save()
+            return redirect('travel_input:schedule_detail', pk=schedule.pk)
+    else:
+        form = ScheduleForm()
+    return render(request, 'travel_input/schedule_form.html', {'form': form})
+
+
+>>>>>>> ef6c3be (새롭게 시작)
 @login_required
 def schedule_update(request, pk):
     schedule = get_object_or_404(Schedule, pk=pk, user=request.user)
@@ -173,6 +227,10 @@ def schedule_update(request, pk):
         form = ScheduleForm(instance=schedule)
     return render(request, 'travel_input/schedule_form.html', {'form': form})
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> ef6c3be (새롭게 시작)
 @login_required
 def schedule_delete(request, pk):
     schedule = get_object_or_404(Schedule, pk=pk, user=request.user)
@@ -182,14 +240,25 @@ def schedule_delete(request, pk):
         return redirect('travel_input:schedule_list')
     return render(request, 'travel_input/schedule_confirm_delete.html', {'schedule': schedule})
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> ef6c3be (새롭게 시작)
 @login_required
 def confirm_delete_all(request):
     if request.method == 'POST':
         Schedule.objects.filter(user=request.user).delete()
+<<<<<<< HEAD
         messages.success(request, '모든 일정이 삭제되었습니다.')
         return redirect('travel_input:schedule_list')
     return render(request, 'travel_input/schedule_confirm_delete_all.html')
 
+=======
+        return redirect('travel_input:schedule_list')
+    return render(request, 'travel_input/schedule_confirm_delete_all.html')
+
+
+>>>>>>> ef6c3be (새롭게 시작)
 @login_required
 def toggle_favorite(request, pk):
     schedule = get_object_or_404(Schedule, pk=pk, user=request.user)
@@ -197,11 +266,16 @@ def toggle_favorite(request, pk):
     schedule.save()
     return redirect('travel_input:schedule_detail', pk=pk)
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> ef6c3be (새롭게 시작)
 @login_required
 def favorite_schedules(request):
     schedules = Schedule.objects.filter(user=request.user, favorite=True)
     return render(request, 'travel_input/favorite_schedules.html', {'schedules': schedules})
 
+<<<<<<< HEAD
 @login_required
 def calendar_view(request):
     return render(request, 'travel_input/calendar.html')
@@ -218,6 +292,33 @@ def calendar_events(request):
             'url': f'/travel/schedule/{s.id}/'
         })
     return JsonResponse(events, safe=False)
+=======
+
+@login_required
+def generate_dummy_schedules(request):
+    if request.method == 'POST':
+        for _ in range(10):
+            Schedule.objects.create(
+                user=request.user,
+                title='기본 더미 일정',
+                destination='서울',
+                start_date=date.today(),
+                end_date=date.today() + timedelta(days=3),
+                notes='자동 생성된 기본 일정입니다.',
+                num_people=2,
+                budget=500000,
+                tag='기본',
+                lodging_request='도심 호텔',
+                people_composition='본인',
+                pet_friendly=False,
+                travel_style='city',
+                important_factors='food'
+            )
+        messages.success(request, "✅ 일반 더미 일정 10개 생성 완료!")
+        return redirect('travel_input:schedule_list')
+    return render(request, 'travel_input/generate_dummy.html')
+
+>>>>>>> ef6c3be (새롭게 시작)
 
 @login_required
 def generate_ai_style_schedules(request):
@@ -227,8 +328,13 @@ def generate_ai_style_schedules(request):
         count = int(request.POST.get('count', 100))
 
         for _ in range(count):
+<<<<<<< HEAD
             start = date.today() + timedelta(days=random.randint(1, 30))
             end = start + timedelta(days=random.randint(2, 5))
+=======
+            start = datetime.now().replace(hour=random.randint(8, 12), minute=0)
+            end = start + timedelta(hours=random.randint(3, 6))
+>>>>>>> ef6c3be (새롭게 시작)
             dest_name = random.choice(destinations)
             dest_obj, _ = Destination.objects.get_or_create(name=dest_name)
 
@@ -260,6 +366,7 @@ def generate_ai_style_schedules(request):
 
     return render(request, 'travel_input/generate_ai_dummy.html')
 
+<<<<<<< HEAD
 @login_required
 def generate_dummy_schedules(request):
     if request.method == 'POST':
@@ -278,11 +385,39 @@ def generate_dummy_schedules(request):
         return redirect('travel_input:schedule_list')
 
     return render(request, 'travel_input/generate_dummy.html')
+=======
+
+@login_required
+def calendar_view(request):
+    return render(request, 'travel_input/calendar.html')
+
+
+@login_required
+def calendar_events(request):
+    schedules = Schedule.objects.filter(user=request.user)
+    events = [
+        {
+            'title': s.title,
+            'start': s.start_date.isoformat(),
+            'end': s.end_date.isoformat() if s.end_date else s.start_date.isoformat(),
+            'url': f'/travel/schedule/{s.id}/'
+        }
+        for s in schedules if s.start_date and s.end_date
+    ]
+    return JsonResponse(events, safe=False)
+
+
+def api_schedules(request):
+    schedules = Schedule.objects.all().values('id', 'title', 'destination', 'start_date', 'end_date')
+    return JsonResponse(list(schedules), safe=False)
+
+>>>>>>> ef6c3be (새롭게 시작)
 
 @login_required
 def migrate_schedules(request):
     messages.info(request, "⏳ 일정 복제 기능은 아직 구현되지 않았습니다.")
     return redirect('travel_input:schedule_list')
+<<<<<<< HEAD
 
 @login_required
 def api_schedules(request):
@@ -290,3 +425,5 @@ def api_schedules(request):
         'id', 'title', 'destination__name', 'start_date', 'end_date'
     )
     return JsonResponse(list(schedules), safe=False)
+=======
+>>>>>>> ef6c3be (새롭게 시작)
