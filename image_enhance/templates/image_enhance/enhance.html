@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}이미지 개선 - 여행 기록{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">이미지 개선</h2>
+    
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form id="enhanceForm" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <div class="drop-zone" id="dropZone">
+                                <div class="drop-zone__prompt">
+                                    <i class="fas fa-cloud-upload-alt fa-3x mb-3"></i>
+                                    <p>이미지를 여기에 드래그하거나 클릭하여 업로드하세요</p>
+                                </div>
+                                <input type="file" name="image" class="drop-zone__input" accept="image/*" required>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary" id="enhanceButton">
+                                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true" id="loadingSpinner"></span>
+                                <span id="buttonText">이미지 개선</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.drop-zone {
+    max-width: 100%;
+    height: 200px;
+    padding: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-family: "Quicksand", sans-serif;
+    font-size: 20px;
+    cursor: pointer;
+    color: #cccccc;
+    border: 4px dashed #009578;
+    border-radius: 10px;
+}
+
+.drop-zone--over {
+    border-style: solid;
+}
+
+.drop-zone__input {
+    display: none;
+}
+
+.drop-zone__thumb {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #cccccc;
+    background-size: cover;
+    position: relative;
+}
+
+.drop-zone__thumb::after {
+    content: attr(data-label);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 5px 0;
+    color: #ffffff;
+    background: rgba(0, 0, 0, 0.75);
+    font-size: 14px;
+    text-align: center;
+}
+
+.spinner-border {
+    margin-right: 8px;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const dropZoneElement = document.querySelector('.drop-zone');
+    const inputElement = dropZoneElement.querySelector('.drop-zone__input');
+    const enhanceForm = document.getElementById('enhanceForm');
+    const enhanceButton = document.getElementById('enhanceButton');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const buttonText = document.getElementById('buttonText');
+
+    dropZoneElement.addEventListener('click', e => {
+        inputElement.click();
+    });
+
+    inputElement.addEventListener('change', e => {
+        if (inputElement.files.length) {
+            updateThumbnail(dropZoneElement, inputElement.files[0]);
+        }
+    });
+
+    dropZoneElement.addEventListener('dragover', e => {
+        e.preventDefault();
+        dropZoneElement.classList.add('drop-zone--over');
+    });
+
+    ['dragleave', 'dragend'].forEach(type => {
+        dropZoneElement.addEventListener(type, e => {
+            dropZoneElement.classList.remove('drop-zone--over');
+        });
+    });
+
+    dropZoneElement.addEventListener('drop', e => {
+        e.preventDefault();
+
+        if (e.dataTransfer.files.length) {
+            inputElement.files = e.dataTransfer.files;
+            updateThumbnail(dropZoneElement, e.dataTransfer.files[0]);
+        }
+
+        dropZoneElement.classList.remove('drop-zone--over');
+    });
+
+    function updateThumbnail(dropZoneElement, file) {
+        let thumbnailElement = dropZoneElement.querySelector('.drop-zone__thumb');
+
+        if (dropZoneElement.querySelector('.drop-zone__prompt')) {
+            dropZoneElement.querySelector('.drop-zone__prompt').remove();
+        }
+
+        if (!thumbnailElement) {
+            thumbnailElement = document.createElement('div');
+            thumbnailElement.classList.add('drop-zone__thumb');
+            dropZoneElement.appendChild(thumbnailElement);
+        }
+
+        thumbnailElement.dataset.label = file.name;
+
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                thumbnailElement.style.backgroundImage = `url('${reader.result}')`;
+            };
+        } else {
+            thumbnailElement.style.backgroundImage = null;
+        }
+    }
+
+    enhanceForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // 버튼 비활성화 및 로딩 스피너 표시
+        enhanceButton.disabled = true;
+        loadingSpinner.classList.remove('d-none');
+        buttonText.textContent = '처리 중...';
+
+        // FormData 생성 및 전송
+        const formData = new FormData(this);
+        
+        fetch('{% url "image_enhance:enhance" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = data.redirect_url;
+            } else {
+                alert(data.error || '이미지 개선 중 오류가 발생했습니다.');
+                // 에러 발생 시 버튼 상태 복구
+                enhanceButton.disabled = false;
+                loadingSpinner.classList.add('d-none');
+                buttonText.textContent = '이미지 개선';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('이미지 개선 중 오류가 발생했습니다.');
+            // 에러 발생 시 버튼 상태 복구
+            enhanceButton.disabled = false;
+            loadingSpinner.classList.add('d-none');
+            buttonText.textContent = '이미지 개선';
+        });
+    });
+});
+</script>
+{% endblock %} 

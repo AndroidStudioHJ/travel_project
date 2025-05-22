@@ -1,7 +1,7 @@
 # accounts/forms.py
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django import forms
-from .models import CustomUser
+from .models import CustomUser, UserProfile
 
 class CustomUserCreationForm(UserCreationForm):
     gender = forms.ChoiceField(choices=CustomUser.GENDER_CHOICES, widget=forms.RadioSelect)
@@ -51,5 +51,15 @@ class CustomAuthenticationForm(AuthenticationForm):
         }
         self.fields['password'].error_messages = {
             'required': '비밀번호를 입력해주세요.'
+        }
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['bio', 'profile_picture', 'phone_number', 'address']
+        widgets = {
+            'bio': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'address': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
