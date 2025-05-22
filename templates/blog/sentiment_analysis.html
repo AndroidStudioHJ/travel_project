@@ -6,6 +6,17 @@
 {% block extra_css %}
 {{ block.super }}
 <style>
+    /* Pretendard 폰트 임포트 */
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.6/dist/web/static/pretendard.css');
+
+    .sentiment-results-text {
+        font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+        /* 폰트 렌더링 최적화 속성 */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+
     .sentiment-container {
         background-color: rgba(255, 255, 255, 0.9);
         border-radius: 10px;
@@ -126,17 +137,39 @@
     .positive { color: #28a745; }
     .negative { color: #dc3545; }
     .neutral { color: #6c757d; }
+    
+    .sentiment-filters {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+        gap: 15px;
+    }
+    
+    .sentiment-filters a {
+        text-decoration: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+        color: #007bff;
+        border: 1px solid #007bff;
+    }
+    
+    .sentiment-filters a.active {
+        background-color: #007bff;
+        color: white;
+    }
+
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container mt-5">
     <div class="sentiment-container">
-        <div class="sentiment-header">
+        <div class="sentiment-header sentiment-results-text">
             <h1 class="mb-4">네이버 블로그 감성 분석</h1>
         </div>
         
-        <form method="get" class="sentiment-form">
+        <form method="get" class="sentiment-form sentiment-results-text">
             <div class="input-group search-input-group">
                 <input type="text" name="query" class="form-control" placeholder="검색어를 입력하세요" value="{{ query|default:'' }}">
                 <button type="submit" class="btn btn-primary">분석하기</button>
@@ -144,7 +177,7 @@
         </form>
 
         {% if query %}
-            <div class="sentiment-results">
+            <div class="sentiment-results sentiment-results-text">
                 <div class="sentiment-stats">
                     <div class="stat-item">
                         <h5>전체 후기</h5>
@@ -164,55 +197,84 @@
                     </div>
                 </div>
 
-                {% if positive_posts %}
-                    <div class="card sentiment-card">
-                        <div class="card-header bg-success text-white">
-                            <h5 class="mb-0">긍정 후기 상위 5개</h5>
-                        </div>
-                        <div class="card-body">
-                            {% for post in positive_posts %}
-                                <div class="mb-3">
-                                    <h6>{{ post.date }} | {{ post.title }}</h6>
-                                    <a href="{{ post.link }}" target="_blank" class="text-decoration-none">{{ post.link }}</a>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                {% endif %}
+                <div class="sentiment-filters">
+                    <a href="#" class="sentiment-filter {% if not selected_sentiment %}active{% endif %}" data-sentiment="">전체 보기</a>
+                    <a href="#" class="sentiment-filter {% if selected_sentiment == 'positive' %}active{% endif %}" data-sentiment="positive">긍정적 리뷰</a>
+                    <a href="#" class="sentiment-filter {% if selected_sentiment == 'neutral' %}active{% endif %}" data-sentiment="neutral">중립적 리뷰</a>
+                    <a href="#" class="sentiment-filter {% if selected_sentiment == 'negative' %}active{% endif %}" data-sentiment="negative">부정적 리뷰</a>
+                </div>
 
-                {% if negative_posts %}
-                    <div class="card sentiment-card">
-                        <div class="card-header bg-danger text-white">
-                            <h5 class="mb-0">부정 후기 상위 5개</h5>
-                        </div>
-                        <div class="card-body">
-                            {% for post in negative_posts %}
-                                <div class="mb-3">
-                                    <h6>{{ post.date }} | {{ post.title }}</h6>
-                                    <a href="{{ post.link }}" target="_blank" class="text-decoration-none">{{ post.link }}</a>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                {% endif %}
-
-                {% if neutral_posts %}
-                    <div class="card sentiment-card">
-                        <div class="card-header bg-secondary text-white">
-                            <h5 class="mb-0">중립 후기 상위 5개</h5>
-                        </div>
-                        <div class="card-body">
-                            {% for post in neutral_posts %}
-                                <div class="mb-3">
-                                    <h6>{{ post.date }} | {{ post.title }}</h6>
-                                    <a href="{{ post.link }}" target="_blank" class="text-decoration-none">{{ post.link }}</a>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                {% endif %}
+                <div id="sentiment-results-container">
+                    {% include 'blog/sentiment_results.html' %}
+                </div>
             </div>
         {% endif %}
     </div>
 </div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filterButtons = document.querySelectorAll('.sentiment-filter');
+    const resultsContainer = document.getElementById('sentiment-results-container');
+    const query = new URLSearchParams(window.location.search).get('query');
+    
+    // 디바운스 함수
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+    
+    // 로딩 상태 표시 함수
+    function showLoading() {
+        resultsContainer.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">로딩중...</span></div></div>';
+    }
+    
+    // 에러 상태 표시 함수
+    function showError() {
+        resultsContainer.innerHTML = '<div class="alert alert-danger">데이터를 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.</div>';
+    }
+    
+    // AJAX 요청 함수
+    const fetchResults = debounce(function(sentiment) {
+        showLoading();
+        
+        fetch(`/blog/sentiment-results/?query=${query}&sentiment=${sentiment}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(html => {
+                resultsContainer.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showError();
+            });
+    }, 300); // 300ms 디바운스
+
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // 활성화된 버튼 스타일 변경
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+
+            const sentiment = this.dataset.sentiment;
+            fetchResults(sentiment);
+        });
+    });
+});
+</script>
+{% endblock %}
 {% endblock %} 
