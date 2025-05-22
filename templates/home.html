@@ -18,7 +18,7 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/pretendard/1.2.1/static/pretendard.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 {% endblock %}
-{% block title %}홈 - 여행 기록{% endblock %}
+{% block title %}모두투어 - 국내 여행 정보{% endblock %}
 {% block extra_css %}
 {{ block.super }}
 <style>
@@ -75,7 +75,7 @@
 
     .features-grid {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(3, 1fr); /* 이미지에 맞게 3열로 수정 */
         gap: 30px;
         padding: 0 20px;
     }
@@ -248,264 +248,39 @@
         height: 100%;
         background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
         transform: translateX(100%);
-        transition: transform 0.6s ease;
+        transition: transform 0.3s ease;
     }
 
     .cta-button:hover::after {
-        transform: translateX(-100%);
-    }
-
-    @media (max-width: 768px) {
-        .hero-section h1 {
-            font-size: 2.5rem;
-        }
-
-        .hero-section p {
-            font-size: 1.1rem;
-        }
-
-        .feature-card {
-            padding: 25px;
-        }
-
-        .feature-title {
-            font-size: 1.4rem;
-        }
-
-        .feature-description {
-            font-size: 1rem;
-        }
-
-        .cta-section h2 {
-            font-size: 2rem;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .hero-section h1 {
-            font-size: 2rem;
-        }
-
-        .hero-section p {
-            font-size: 1rem;
-        }
-
-        .feature-card {
-            padding: 20px;
-        }
-
-        .feature-title {
-            font-size: 1.3rem;
-        }
-
-        .cta-section h2 {
-            font-size: 1.8rem;
-        }
-    }
-
-    .tabs {
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        flex-wrap: wrap;
-        margin-top: 10px;
-    }
-
-    .tabs div {
-        padding: 12px 24px;
-        background: #007acc;
-        color: white;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .tabs div:hover {
-        background: #005f99;
-    }
-
-    .tabs div.active {
-        background: #003366;
-    }
-
-    .tab-content {
-        display: none;
-        padding: 30px 20px;
-    }
-
-    .tab-content.active-tab {
-        display: block;
-    }
-
-    .category-title {
-        text-align: center;
-        color: white;
-        font-size: 2rem;
-        margin: 40px 0;
-    }
-
-    .category-list {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 40px;
-        padding: 0 20px;
-        max-width: 1400px;
-        margin: 0 auto;
-    }
-
-    .category-item {
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 12px;
-        padding: 0;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        position: relative;
-        min-height: 400px;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        backdrop-filter: blur(5px);
-    }
-
-    .category-item img {
-        width: 100%;
-        height: 250px;
-        object-fit: cover;
-        border-radius: 12px 12px 0 0;
-        margin-bottom: 0;
-    }
-
-    .category-item .content-wrapper {
-        padding: 20px;
-        position: relative;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .category-item h4 {
-        font-size: 1.6rem;
-        color: #003366;
-        margin-bottom: 15px;
-    }
-
-    .category-item p {
-        font-size: 1rem;
-        color: #666;
-        margin-bottom: 30px;
-        line-height: 1.6;
-        min-height: 80px;
-    }
-
-    .category-item .booking-button {
-        position: relative;
-        background-color: #3498db;
-        color: white;
-        padding: 8px 20px;
-        border: none;
-        border-radius: 20px;
-        font-size: 0.9rem;
-        cursor: pointer;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        margin-top: auto;
-        display: inline-block;
-        width: fit-content;
-        white-space: nowrap;
-    }
-
-    .category-item .booking-button:hover {
-        background-color: #2980b9;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-
-    .category-item::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 250px;
-        background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.5));
-        border-radius: 12px 12px 0 0;
-        pointer-events: none;
-    }
-
-    table {
-        width: 100%;
-        max-width: 800px;
-        margin: 40px auto;
-        border-collapse: collapse;
-        background: white;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        border-radius: 12px;
-        overflow: hidden;
-    }
-
-    td, th {
-        padding: 15px 20px;
-        border: 1px solid #e0e0e0;
-    }
-
-    th {
-        background-color: #007acc;
-        color: white;
-        font-weight: 600;
-    }
-
-    tr:hover {
-        background-color: #f5f9ff;
-    }
-
-    @media (max-width: 768px) {
-        .category-list {
-            grid-template-columns: 1fr;
-        }
-
-        .category-item {
-            width: 80%;
-            margin: 0 auto;
-        }
+        transform: translateX(0);
     }
 
     .info-section {
-        padding: 40px 20px; 
-        background: rgba(255, 255, 255, 0.9);
-        border-radius: 16px;
-        max-width: max-content;
-    }
-
-    .info-header {
+        padding: 60px 20px;
         text-align: center;
+        background: #f8fafc;
+    }
+
+    .info-section h2 {
+        font-size: 2.5rem;
         margin-bottom: 40px;
-    }
-
-    .info-header h2 {
-        color: #002d49;
-        font-size: 2rem;
-        margin-bottom: 15px;
-    }
-
-    .info-header p {
-        color: #666;
-        font-size: 1.1rem;
-        max-width: 700px;
-        margin: 0 auto;
-        line-height: 1.6;
+        color: #2c3e50;
     }
 
     .info-grid {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(4, 1fr); /* 이미지에 맞게 4열로 수정 */
         gap: 30px;
-        margin-top: 40px;
+        max-width: 1200px;
+        margin: 0 auto;
     }
 
     .info-card {
         background: white;
-        border-radius: 12px;
-        padding: 25px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        text-align: left;
         transition: transform 0.3s ease;
     }
 
@@ -514,133 +289,154 @@
     }
 
     .info-card h3 {
-        color: #007acc;
-        font-size: 1.3rem;
-        margin-bottom: 15px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .info-card h3 i {
         font-size: 1.4rem;
+        margin-bottom: 15px;
+        color: #3498db;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
     }
 
     .info-card p {
+        font-size: 1rem;
         color: #555;
         line-height: 1.6;
         margin-bottom: 15px;
     }
 
-    .info-card ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .info-card li {
-        color: #666;
-        margin-bottom: 8px;
-        padding-left: 20px;
-        position: relative;
-    }
-
-    .info-card li:before {
-        content: "•";
-        color: #007acc;
-        position: absolute;
-        left: 0;
-    }
-
     .info-link {
-        display: inline-block;
-        color: #007acc;
+        color: #3498db;
         text-decoration: none;
         font-weight: 500;
-        margin-top: 15px;
         transition: color 0.3s ease;
     }
 
     .info-link:hover {
-        color: #005f99;
+        text-decoration: underline;
+    }
+
+    @media (max-width: 992px) {
+        .features-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .info-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 576px) {
+        .features-grid {
+            grid-template-columns: 1fr;
+        }
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+        .hero-section h1 {
+            font-size: 2.5rem;
+        }
+        .hero-section p {
+            font-size: 1rem;
+        }
+        .cta-section h2 {
+            font-size: 2rem;
+        }
+        .cta-section p {
+            font-size: 1rem;
+        }
+        .feature-card, .info-card {
+            padding: 25px;
+        }
     }
 </style>
 {% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-md-12 text-center">
-            <h1 class="display-4 mb-4">여행 기록에 오신 것을 환영합니다</h1>
-            <p class="lead">당신의 소중한 여행 순간을 기록하고 공유하세요.</p>
+<div class="container">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <h1>당신의 완벽한 여행을 설계하세요</h1>
+        <p>복잡한 여행 계획은 이제 그만. 스마트 일정 관리, 맞춤형 장소 추천, 예산 계획까지 한 곳에서 편리하게 이용하세요.</p>
+    </div>
+
+    <!-- Features Section 1 -->
+    <div class="features-container">
+        <div class="features-grid">
+            <a href="{% url 'travel_input:schedule_create' %}" class="feature-card animate__animated animate__fadeInUp">
+                <i class="fas fa-calendar-alt feature-icon"></i>
+                <h3 class="feature-title">스마트 일정 관리</h3>
+                <p class="feature-description">여행 일정을 손쉽게 계획하고 관리하세요. 실시간으로 업데이트되는 일정으로 여행을 더욱 효율적으로 즐길 수 있습니다.</p>
+                <span class="feature-link">일정 만들기</span>
+            </a>
+            <a href="#" class="feature-card animate__animated animate__fadeInUp animate__delay-0.2s">
+                 <i class="fas fa-map-marker-alt feature-icon"></i>
+                <h3 class="feature-title">맞춤형 장소 추천</h3>
+                <p class="feature-description">여행 취향과 관심사에 맞춰 최적의 장소를 추천받으세요. 숨겨진 명소부터 인기 맛집까지, 완벽한 코스를 계획할 수 있습니다.</p>
+                <span class="feature-link">장소 보기</span>
+            </a>
+            <a href="#" class="feature-card animate__animated animate__fadeInUp animate__delay-0.4s">
+                <i class="fas fa-money-bill-wave feature-icon"></i>
+                <h3 class="feature-title">예산 계획</h3>
+                <p class="feature-description">여행 경비를 효율적으로 관리하세요. 예산 설정부터 지출 추적까지, 스마트한 예산 관리를 통해 불필요한 지출을 줄일 수 있습니다.</p>
+                <span class="feature-link">예산 계획</span>
+            </a>
         </div>
     </div>
 
-    <div class="row mt-5">
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body text-center">
-                    <i class="fas fa-map-marked-alt fa-3x mb-3 text-primary"></i>
-                    <h3>여행 지도</h3>
-                    <p>방문한 장소를 지도에 표시하고 기록하세요.</p>
-                    <a href="{% url 'travel:map' %}" class="btn btn-primary">지도 보기</a>
-                </div>
+    <!-- CTA Section -->
+    <div class="cta-section">
+        <h2>지금 바로 여행 계획 시작하기</h2>
+        <p>모두투어와 함께라면 나만의 특별한 여행을 만들 수 있습니다. 간단한 절차로 지금 바로 여행 계획을 시작해보세요!</p>
+        <a href="{% url 'travel_input:schedule_create' %}" class="cta-button animate__animated animate__pulse animate__infinite">여행 시작하기</a>
+    </div>
+
+    <!-- Features Section 2 (Based on bottom part of image) -->
+    <div class="info-section">
+        <h2>알찬 국내 여행의 모든 것</h2>
+        <div class="info-grid">
+            <div class="info-card">
+                <h3>지역별 추천 코스</h3>
+                <p>각 지역의 매력적인 여행 코스를 확인하세요. 역사, 문화, 자연 등 다양한 테마로 구성된 코스를 따라 특별한 여행을 경험해보세요.</p>
+                <ul>
+                    <li>- 제주도 해안도로 드라이브</li>
+                    <li>- 서울 고궁 탐방</li>
+                    <li>- 부산 해운대와 감천문화마을</li>
+                    <li>- 강원도 설악산 등반</li>
+                </ul>
+                <a href="#" class="info-link">더 많은 코스 보기</a>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body text-center">
-                    <i class="fas fa-image fa-3x mb-3 text-success"></i>
-                    <h3>이미지 개선</h3>
-                    <p>여행 사진을 더 선명하고 아름답게 만들어보세요.</p>
-                    <a href="{% url 'image_enhance:enhance' %}" class="btn btn-success">이미지 개선</a>
-                </div>
+            <div class="info-card">
+                <h3>여행 & 쇼핑</h3>
+                <p>여행의 즐거움을 더하는 쇼핑 정보를 제공합니다. 지역 특산품부터 최신 트렌드 아이템까지, 여행지에서의 특별한 쇼핑 경험을 계획하세요.</p>
+                <ul>
+                    <li>- 지역별 특산품</li>
+                    <li>- 면세점 이용 가이드</li>
+                    <li>- 아울렛 정보</li>
+                    <li>- 전통 시장 쇼핑</li>
+                </ul>
+                <a href="#" class="info-link">쇼핑 정보 보기</a>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body text-center">
-                    <i class="fas fa-blog fa-3x mb-3 text-info"></i>
-                    <h3>블로그 감성 분석</h3>
-                    <p>여행 블로그의 감성을 분석해보세요.</p>
-                    <a href="{% url 'blog:sentiment_analysis' %}" class="btn btn-info">감성 분석</a>
-                </div>
+             <div class="info-card">
+                <h3>숙소 정보</h3>
+                <p>편안하고 안전한 여행을 위한 숙소 정보를 제공합니다. 호텔, 리조트, 펜션, 게스트하우스 등 다양한 종류의 숙소를 비교하고 예약하세요.</p>
+                <ul>
+                    <li>- 인기 호텔 추천</li>
+                    <li>- 가성비 좋은 숙소</li>
+                    <li>- 특별한 테마 숙소</li>
+                    <li>- 예약 가이드</li>
+                </ul>
+                <a href="#" class="info-link">숙소 정보 보기</a>
+            </div>
+            <div class="info-card">
+                <h3>시기를 추천</h3>
+                <p>여행 목적지와 시기에 맞는 최적의 여행 정보를 추천합니다. 계절별 축제, 날씨 정보, 관광객 밀집도 등을 고려하여 완벽한 여행 시기를 선택하세요.</p>
+                <ul>
+                    <li>- 계절별 추천 여행지</li>
+                    <li>- 축제 정보</li>
+                    <li>- 연휴 기간 여행 팁</li>
+                    <li>- 비수기 추천</li>
+                </ul>
+                <a href="#" class="info-link">시기 추천 보기</a>
             </div>
         </div>
     </div>
 </div>
 {% endblock %}
-{% block extra_js %} 
-{{ block.super }}
-<script>
-    function switchTab(tabNumber) {
-        // Hide all content
-        document.querySelectorAll('.tab-content').forEach((content) => {
-            content.classList.remove('active-tab');
-        });
-
-        // Remove active class from all tabs
-        document.querySelectorAll('.tabs div').forEach((tab) => {
-            tab.classList.remove('active');
-        });
-
-        // Show the selected tab content and highlight the tab
-        document.getElementById('content' + tabNumber).classList.add('active-tab');
-        document.getElementById('tab' + tabNumber).classList.add('active');
-    }
-
-    // Intersection Observer를 사용하여 스크롤 애니메이션 구현
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('animate__animated', 'animate__fadeInUp');
-            }
-        });
-    }, {
-        threshold: 0.1
-    });
-
-    document.querySelectorAll('.feature-card').forEach(card => {
-        observer.observe(card);
-    });
-</script>
-{% endblock extra_js %}
