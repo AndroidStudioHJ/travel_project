@@ -52,4 +52,6 @@ uploads/processed/  # 처리된 이미지만 제외
 *.h5
 *.ckpt
 
+templates/blog_search/
+
 

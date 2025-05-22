@@ -1,280 +1,417 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}블로그 감성 분석{% endblock %}
-
-{% block extra_css %}
+{% block extra_head %}
 {{ block.super }}
 <style>
-    /* Pretendard 폰트 임포트 */
-    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.6/dist/web/static/pretendard.css');
-
-    .sentiment-results-text {
-        font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
-        /* 폰트 렌더링 최적화 속성 */
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        text-rendering: optimizeLegibility;
-    }
-
-    .sentiment-container {
-        background-color: rgba(255, 255, 255, 0.9);
-        border-radius: 10px;
+    .search-container {
+        max-width: 800px;
+        margin: 20px auto;
         padding: 20px;
-        margin-top: 20px;
+        background-color: #fff;
+        border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
-    .sentiment-header {
-        text-align: center;
-        margin-bottom: 30px;
-    }
-
-    .sentiment-form {
-        max-width: 600px;
-        margin: 0 auto;
+    .search-form {
         display: flex;
-        justify-content: center;
-    }
-
-    .search-input-group {
-        display: flex;
-        border: 1px solid #ced4da;
-        border-radius: 0.25rem;
-        overflow: hidden;
-        width: 100%;
-        max-width: 400px;
-    }
-
-    .search-input-group .form-control {
-        border: none;
-        box-shadow: none;
-        flex-grow: 1;
-        padding-left: 0.75rem;
-    }
-
-    .search-input-group .btn-primary {
-        border: none;
-        background-color: #007bff;
-        color: white;
-        cursor: pointer;
-        padding: 0.375rem 0.75rem;
-        flex-shrink: 0;
-    }
-
-    .sentiment-form .input-group > .form-control:not(:first-child),
-    .sentiment-form .input-group > .btn:not(:first-child):not(:last-child) {
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-    }
-    .sentiment-form .input-group > .btn:not(:last-child):not(:first-child) {
-         border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
-    }
-     .sentiment-form .input-group > .form-control + .btn {
-         border-left: none;
-     }
-
-    .sentiment-results {
-        margin-top: 30px;
-    }
-
-    .sentiment-card {
+        gap: 10px;
         margin-bottom: 20px;
-        border: none;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        width: 100%;
     }
 
-    .sentiment-card .card-header {
-        font-weight: bold;
-        padding: 15px;
-        font-size: 1.1rem;
-    }
-
-    .sentiment-card .card-body {
-        padding: 25px;
-    }
-
-    .sentiment-stats {
-        display: flex;
-        justify-content: space-around;
-        margin-bottom: 20px;
-        text-align: center;
-        flex-wrap: wrap;
-    }
-
-    .stat-item {
+    .search-form input[type="text"] {
         flex-grow: 1;
-        padding: 15px;
-        border-radius: 5px;
-        background-color: rgba(0,0,0,0.05);
-        min-width: 120px;
-        margin: 5px;
-    }
-
-    .stat-item h5 {
-        margin-bottom: 5px;
-        font-size: 1.1rem;
-    }
-
-    .stat-item p {
-        margin-bottom: 0;
-        font-size: 1.3rem;
-        font-weight: bold;
-    }
-
-    .sentiment-card .card-body h6 {
-        margin-bottom: 8px;
-        font-size: 1.05rem;
-    }
-
-    .sentiment-card .card-body a {
-        word-break: break-all;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
         font-size: 1rem;
     }
 
-    .positive { color: #28a745; }
-    .negative { color: #dc3545; }
-    .neutral { color: #6c757d; }
-    
-    .sentiment-filters {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 20px;
-        gap: 15px;
-    }
-    
-    .sentiment-filters a {
-        text-decoration: none;
-        padding: 8px 15px;
-        border-radius: 4px;
-        transition: background-color 0.3s ease;
-        color: #007bff;
-        border: 1px solid #007bff;
-    }
-    
-    .sentiment-filters a.active {
-        background-color: #007bff;
+    .search-form button {
+        padding: 10px 20px;
+        background-color: #007acc;
         color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background-color 0.3s ease;
     }
 
+    .search-form button:hover {
+        background-color: #005f99;
+    }
+
+    .summary-section {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: #f9f9f9;
+        border-radius: 4px;
+        border: 1px solid #eee;
+    }
+
+    .summary-item {
+        text-align: center;
+    }
+
+    .summary-item h3 {
+        margin: 0 0 5px 0;
+        font-size: 1rem;
+        color: #555;
+    }
+
+    .summary-item p {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: bold;
+    }
+
+    .summary-item .positive { color: #28a745; }
+    .summary-item .neutral { color: #ffc107; }
+    .summary-item .negative { color: #dc3545; }
+    .summary-item .total { color: #007acc; }
+
+    .results-tabs {
+        display: flex;
+        border-bottom: 1px solid #ccc;
+        margin-bottom: 20px;
+    }
+
+    .results-tabs button {
+        flex-grow: 1;
+        padding: 10px 15px;
+        border: none;
+        background-color: transparent;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        border-bottom: 2px solid transparent;
+    }
+
+    .results-tabs button.active {
+        border-bottom-color: #007acc;
+        color: #007acc;
+        font-weight: bold;
+    }
+
+    .result-list li {
+        list-style: none;
+        margin-bottom: 15px;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        background-color: #fff;
+        transition: all 0.2s ease-in-out;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .result-list li:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .result-list h4 {
+        margin: 0 0 12px 0;
+        font-size: 1.2rem;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .result-list p {
+        margin: 0 0 12px 0;
+        font-size: 0.95rem;
+        color: #555;
+        line-height: 1.6;
+    }
+
+    .result-list a {
+        font-size: 0.9rem;
+        color: #007acc;
+        text-decoration: none;
+        transition: color 0.2s ease;
+        display: inline-block;
+        margin-top: 10px;
+        padding: 6px 12px;
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+    }
+
+    .result-list a:hover {
+        background-color: #e9ecef;
+        text-decoration: none;
+    }
+
+    .result-content {
+        display: none;
+    }
+
+    .result-content.active {
+        display: block;
+    }
+
+    .positive-sentiment {
+        color: #28a745;
+        font-weight: bold;
+    }
+
+    .negative-sentiment {
+        color: #dc3545;
+        font-weight: bold;
+    }
+
+    .neutral-sentiment {
+        color: #ffc107;
+        font-weight: bold;
+    }
+
+    .sentiment-counts {
+        margin: 10px 0;
+        font-size: 0.9rem;
+        padding: 8px 12px;
+        background-color: #f8f9fa;
+        border-radius: 6px;
+        display: inline-block;
+    }
+    
+    .positive-count {
+        color: #28a745;
+        margin-right: 15px;
+        font-weight: 500;
+    }
+    
+    .negative-count {
+        color: #dc3545;
+        font-weight: 500;
+    }
+
+    .blog-content {
+        max-height: 300px;
+        overflow-y: auto;
+        padding: 15px;
+        margin: 10px 0;
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        transition: all 0.3s ease;
+    }
+
+    .blog-content::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .blog-content::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .blog-content::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+
+    .blog-content::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    .content-toggle {
+        color: #007acc;
+        cursor: pointer;
+        font-size: 0.9rem;
+        margin: 5px 0;
+        display: inline-block;
+        padding: 6px 12px;
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+    }
+
+    .content-toggle:hover {
+        background-color: #e9ecef;
+        text-decoration: none;
+    }
+
+    .content-toggle.active {
+        background-color: #007acc;
+        color: white;
+        border-color: #007acc;
+    }
 </style>
 {% endblock %}
 
+{% block title %}블로그 감성 분석{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-    <div class="sentiment-container">
-        <div class="sentiment-header sentiment-results-text">
-            <h1 class="mb-4">네이버 블로그 감성 분석</h1>
+<div class="search-container">
+    <h2>네이버 블로그 감성 분석</h2>
+    <p>네이버 블로그에서 여행지, 맛집, 호텔 등 다양한 키워드로 실제 후기를 한눈에 확인하세요.</p>
+
+    <form method="get" class="search-form">
+        <input type="text" name="query" placeholder="검색어를 입력하세요" value="{{ query|default:'' }}">
+        <button type="submit">분석하기</button>
+    </form>
+
+    {% if query %}
+    <div class="summary-section">
+        <div class="summary-item">
+            <h3>긍정적</h3>
+            <p class="positive">{{ positive_count }}</p>
         </div>
-        
-        <form method="get" class="sentiment-form sentiment-results-text">
-            <div class="input-group search-input-group">
-                <input type="text" name="query" class="form-control" placeholder="검색어를 입력하세요" value="{{ query|default:'' }}">
-                <button type="submit" class="btn btn-primary">분석하기</button>
-            </div>
-        </form>
-
-        {% if query %}
-            <div class="sentiment-results sentiment-results-text">
-                <div class="sentiment-stats">
-                    <div class="stat-item">
-                        <h5>전체 후기</h5>
-                        <p>{{ total_count }}개</p>
-                    </div>
-                    <div class="stat-item positive">
-                        <h5>긍정 후기</h5>
-                        <p>{{ positive_count }}개</p>
-                    </div>
-                    <div class="stat-item negative">
-                        <h5>부정 후기</h5>
-                        <p>{{ negative_count }}개</p>
-                    </div>
-                    <div class="stat-item neutral">
-                        <h5>중립 후기</h5>
-                        <p>{{ neutral_count }}개</p>
-                    </div>
-                </div>
-
-                <div class="sentiment-filters">
-                    <a href="#" class="sentiment-filter {% if not selected_sentiment %}active{% endif %}" data-sentiment="">전체 보기</a>
-                    <a href="#" class="sentiment-filter {% if selected_sentiment == 'positive' %}active{% endif %}" data-sentiment="positive">긍정적 리뷰</a>
-                    <a href="#" class="sentiment-filter {% if selected_sentiment == 'neutral' %}active{% endif %}" data-sentiment="neutral">중립적 리뷰</a>
-                    <a href="#" class="sentiment-filter {% if selected_sentiment == 'negative' %}active{% endif %}" data-sentiment="negative">부정적 리뷰</a>
-                </div>
-
-                <div id="sentiment-results-container">
-                    {% include 'blog/sentiment_results.html' %}
-                </div>
-            </div>
-        {% endif %}
+        <div class="summary-item">
+            <h3>중립적</h3>
+            <p class="neutral">{{ neutral_count }}</p>
+        </div>
+        <div class="summary-item">
+            <h3>부정적</h3>
+            <p class="negative">{{ negative_count }}</p>
+        </div>
+        <div class="summary-item">
+            <h3>전체</h3>
+            <p class="total">{{ total_count }}</p>
+        </div>
     </div>
-</div>
 
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const filterButtons = document.querySelectorAll('.sentiment-filter');
-    const resultsContainer = document.getElementById('sentiment-results-container');
-    const query = new URLSearchParams(window.location.search).get('query');
-    
-    // 디바운스 함수
-    function debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    }
-    
-    // 로딩 상태 표시 함수
-    function showLoading() {
-        resultsContainer.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">로딩중...</span></div></div>';
-    }
-    
-    // 에러 상태 표시 함수
-    function showError() {
-        resultsContainer.innerHTML = '<div class="alert alert-danger">데이터를 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.</div>';
-    }
-    
-    // AJAX 요청 함수
-    const fetchResults = debounce(function(sentiment) {
-        showLoading();
-        
-        fetch(`/blog/sentiment-results/?query=${query}&sentiment=${sentiment}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.text();
-            })
-            .then(html => {
-                resultsContainer.innerHTML = html;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showError();
+    <div class="results-tabs">
+        <button class="tab-button active" onclick="showResults('all')">전체 보기</button>
+        <button class="tab-button" onclick="showResults('positive')">긍정적 리뷰</button>
+        <button class="tab-button" onclick="showResults('neutral')">중립적 리뷰</button>
+        <button class="tab-button" onclick="showResults('negative')">부정적 리뷰</button>
+    </div>
+
+    <div id="all-results" class="result-content active">
+        <ul class="result-list">
+            {% for post in displayed_posts %}
+            <li>
+                <h4>{{ post.title }}</h4>
+                <p>{{ post.date }}</p>
+                <p>{{ post.summary }}</p>
+                <div class="sentiment-counts">
+                    <span class="positive-count">긍정 단어: {{ post.positive_count }}회</span>
+                    <span class="negative-count">부정 단어: {{ post.negative_count }}회</span>
+                </div>
+                <span class="content-toggle" onclick="toggleContent(this)">본문 보기 ▼</span>
+                <div class="blog-content" style="display: none;">
+                    {{ post.content }}
+                </div>
+                <a href="{{ post.link }}" target="_blank">원문 보기</a>
+            </li>
+            {% empty %}
+            <li>검색 결과가 없습니다.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div id="positive-results" class="result-content">
+        <h3>긍정적 리뷰</h3>
+        <ul class="result-list">
+            {% for post in displayed_posts %}
+            {% if post.positive_count > post.negative_count %}
+            <li>
+                <h4>{{ post.title }}</h4>
+                <p>{{ post.date }}</p>
+                <p>{{ post.summary }}</p>
+                <div class="sentiment-counts">
+                    <span class="positive-count">긍정 단어: {{ post.positive_count }}회</span>
+                    <span class="negative-count">부정 단어: {{ post.negative_count }}회</span>
+                </div>
+                <span class="content-toggle" onclick="toggleContent(this)">본문 보기 ▼</span>
+                <div class="blog-content" style="display: none;">
+                    {{ post.content }}
+                </div>
+                <a href="{{ post.link }}" target="_blank">원문 보기</a>
+            </li>
+            {% endif %}
+            {% empty %}
+            <li>긍정적 리뷰가 없습니다.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div id="neutral-results" class="result-content">
+        <h3>중립적 리뷰</h3>
+        <ul class="result-list">
+            {% for post in displayed_posts %}
+            {% if post.positive_count == post.negative_count %}
+            <li>
+                <h4>{{ post.title }}</h4>
+                <p>{{ post.date }}</p>
+                <p>{{ post.summary }}</p>
+                <div class="sentiment-counts">
+                    <span class="positive-count">긍정 단어: {{ post.positive_count }}회</span>
+                    <span class="negative-count">부정 단어: {{ post.negative_count }}회</span>
+                </div>
+                <span class="content-toggle" onclick="toggleContent(this)">본문 보기 ▼</span>
+                <div class="blog-content" style="display: none;">
+                    {{ post.content }}
+                </div>
+                <a href="{{ post.link }}" target="_blank">원문 보기</a>
+            </li>
+            {% endif %}
+            {% empty %}
+            <li>중립적 리뷰가 없습니다.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div id="negative-results" class="result-content">
+        <h3>부정적 리뷰</h3>
+        <ul class="result-list">
+            {% for post in displayed_posts %}
+            {% if post.negative_count > post.positive_count %}
+            <li>
+                <h4>{{ post.title }}</h4>
+                <p>{{ post.date }}</p>
+                <p>{{ post.summary }}</p>
+                <div class="sentiment-counts">
+                    <span class="positive-count">긍정 단어: {{ post.positive_count }}회</span>
+                    <span class="negative-count">부정 단어: {{ post.negative_count }}회</span>
+                </div>
+                <span class="content-toggle" onclick="toggleContent(this)">본문 보기 ▼</span>
+                <div class="blog-content" style="display: none;">
+                    {{ post.content }}
+                </div>
+                <a href="{{ post.link }}" target="_blank">원문 보기</a>
+            </li>
+            {% endif %}
+            {% empty %}
+            <li>부정적 리뷰가 없습니다.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <script>
+        function showResults(sentiment) {
+            const contents = document.querySelectorAll('.result-content');
+            contents.forEach(content => {
+                content.classList.remove('active');
             });
-    }, 300); // 300ms 디바운스
+            document.getElementById(sentiment + '-results').classList.add('active');
 
-    filterButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            // 활성화된 버튼 스타일 변경
-            filterButtons.forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(button => {
+                button.classList.remove('active');
+            });
+            document.querySelector('.tab-button[onclick="showResults(\'' + sentiment + '\')"]').classList.add('active');
+        }
 
-            const sentiment = this.dataset.sentiment;
-            fetchResults(sentiment);
-        });
-    });
-});
-</script>
-{% endblock %}
+        function toggleContent(element) {
+            const content = element.nextElementSibling;
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                element.textContent = '본문 접기 ▲';
+                element.classList.add('active');
+            } else {
+                content.style.display = 'none';
+                element.textContent = '본문 보기 ▼';
+                element.classList.remove('active');
+            }
+        }
+    </script>
+    {% endif %}
+</div>
 {% endblock %} 

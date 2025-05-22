@@ -32,16 +32,47 @@ def parse_posts(html: bytes) -> list[dict]:
         if not a_title:
             continue
         title = a_title.get_text(strip=True)
-        link  = a_title["href"]
+        link = a_title["href"]
         a_desc = item.select_one("a.dsc_link")
         summary = a_desc.get_text(strip=True) if a_desc else ""
         span_date = item.select_one("span.sub")
         date = span_date.get_text(strip=True) if span_date else ""
+        
+        # 블로그 본문 가져오기
+        try:
+            blog_html = fetch_html(link)
+            blog_soup = BeautifulSoup(blog_html, "html.parser")
+            
+            # iframe URL 가져오기
+            iframe = blog_soup.select_one("iframe#mainFrame")
+            if iframe and iframe.get("src"):
+                iframe_url = "https://blog.naver.com" + iframe["src"]
+                iframe_html = fetch_html(iframe_url)
+                iframe_soup = BeautifulSoup(iframe_html, "html.parser")
+                
+                # 본문 내용 추출
+                content_div = iframe_soup.select_one("div.se-main-container")
+                if content_div:
+                    # 불필요한 요소 제거
+                    for element in content_div.select("script, style, .se-section-link"):
+                        element.decompose()
+                    
+                    # 본문 텍스트 추출
+                    full_text = content_div.get_text(strip=True)
+                else:
+                    full_text = summary
+            else:
+                full_text = summary
+        except Exception as e:
+            print(f"Error fetching blog content: {e}")
+            full_text = summary
+        
         posts.append({
-            "date":    date,
-            "title":   title,
-            "link":    link,
-            "summary": summary
+            "date": date,
+            "title": title,
+            "link": link,
+            "summary": summary,
+            "content": full_text
         })
     return posts
 
@@ -60,22 +91,43 @@ NEGATIVE_KEYWORDS = {
     "혼잡", "위험", "피곤", "비싸"
 }
 
-def rule_sentiment(text: str) -> str:
-    score = 0
-    for w in POSITIVE_KEYWORDS:
-        if w in text:
-            score += 1
-    for w in NEGATIVE_KEYWORDS:
-        if w in text:
-            score -= 1
-    if score > 0:
-        return "positive"
-    if score < 0:
-        return "negative"
-    return "neutral"
+def rule_sentiment(text: str) -> tuple[str, int, int]:
+    positive_count = 0
+    negative_count = 0
+    
+    # 긍정 단어 빈도 계산
+    for word in POSITIVE_KEYWORDS:
+        count = text.count(word)
+        positive_count += count
+            
+    # 부정 단어 빈도 계산
+    for word in NEGATIVE_KEYWORDS:
+        count = text.count(word)
+        negative_count += count
+            
+    # 빈도 기반 감성 판단
+    if positive_count == negative_count:
+        return "neutral", positive_count, negative_count
+    elif positive_count > negative_count:
+        return "positive", positive_count, negative_count
+    else:
+        return "negative", positive_count, negative_count
 
 def split_by_sentiment(posts: list[dict]):
-    positive = [p for p in posts if rule_sentiment(p["summary"]) == "positive"]
-    negative = [p for p in posts if rule_sentiment(p["summary"]) == "negative"]
-    neutral  = [p for p in posts if rule_sentiment(p["summary"]) == "neutral"]
+    positive = []
+    negative = []
+    neutral = []
+    
+    for post in posts:
+        sentiment, pos_count, neg_count = rule_sentiment(post["content"])
+        post["positive_count"] = pos_count
+        post["negative_count"] = neg_count
+        
+        if sentiment == "positive":
+            positive.append(post)
+        elif sentiment == "negative":
+            negative.append(post)
+        else:
+            neutral.append(post)
+            
     return positive, negative, neutral 
