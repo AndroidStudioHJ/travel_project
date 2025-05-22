@@ -63,7 +63,6 @@ class SentimentAnalysisView(TemplateView):
                      sentiment=sentiment
                  )
 
-
         context.update({
             'query': query,
             'selected_sentiment': selected_sentiment,
@@ -72,8 +71,6 @@ class SentimentAnalysisView(TemplateView):
             'negative_count': negative_count,
             'neutral_count': neutral_count,
             'displayed_posts': displayed_posts,
-            # 기존의 상위 5개 로직은 필터링 기능 추가로 인해 제거되거나 변경될 수 있습니다.
-            # 템플릿에서 displayed_posts를 순회하며 전체 목록을 보여줍니다.
         })
 
         return context
@@ -143,31 +140,3 @@ def add_comment(request, pk):
             messages.success(request, '댓글이 성공적으로 등록되었습니다.')
             return redirect('blog:post_detail', pk=post.pk)
     return redirect('blog:post_detail', pk=post.pk)
-
-def sentiment_results(request):
-    query = request.GET.get('query', '')
-    selected_sentiment = request.GET.get('sentiment', '')
-    
-    posts = []
-    displayed_posts = []
-    
-    if query:
-        url = build_search_url(query)
-        html = fetch_html(url)
-        all_posts = parse_posts(html)
-        
-        positive, negative, neutral = split_by_sentiment(all_posts)
-        
-        if selected_sentiment == 'positive':
-            displayed_posts = positive
-        elif selected_sentiment == 'negative':
-            displayed_posts = negative
-        elif selected_sentiment == 'neutral':
-            displayed_posts = neutral
-        else:
-            displayed_posts = all_posts
-    
-    return render(request, 'blog/sentiment_results.html', {
-        'displayed_posts': displayed_posts,
-        'selected_sentiment': selected_sentiment
-    })
