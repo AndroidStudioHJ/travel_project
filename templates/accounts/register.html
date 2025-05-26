@@ -206,6 +206,18 @@
                 {% endif %}
             </div>
 
+            <div class="form-group">
+                <label for="{{ form.email.id_for_label }}">이메일</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <div class="text-danger">
+                        {% for error in form.email.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
             <div class="form-divider"></div>
             <div class="form-section-title">개인정보</div>
 

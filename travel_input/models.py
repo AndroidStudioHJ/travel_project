@@ -12,7 +12,7 @@ class Category(models.Model):
         return self.name
 
 class Destination(models.Model):
-    name = models.CharField(max_length=100, unique=True, verbose_name="\uc5ec\ud589\uc9c0\uba85")
+    name = models.CharField(max_length=100, unique=True, verbose_name="여행지명")
     def __str__(self):
         return self.name
 
@@ -92,7 +92,7 @@ class Place(models.Model):
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, related_name='places')
     name = models.CharField(max_length=200)
     visit_date = models.DateField()
-    category = models.ForeignKey(Category, null=True, blank=True, on_delete=models.SET_NULL, verbose_name='\uce74\ud14c\uace0\ub9ac')
+    category = models.ForeignKey(Category, null=True, blank=True, on_delete=models.SET_NULL, verbose_name='카테고리')
     def __str__(self):
         return f"{self.name} - {self.visit_date}"
 
@@ -144,13 +144,14 @@ class GroupMessage(models.Model):
         return f"{self.user.username}: {self.content[:50]}"
 
 class City(models.Model):
-    name = models.CharField(max_length=50, verbose_name='\ub3c4\uc2dc\uba85')
-    slug = models.SlugField(unique=True, verbose_name='\uc2ac\ub7ec\uadf8')
-    is_active = models.BooleanField(default=True, verbose_name='\ud65c\uc131\ud654 \uc720\ubb34')
-    order = models.IntegerField(default=0, verbose_name='\uc815\ub82c \uc21c\uc11c')
+    name = models.CharField(max_length=50, verbose_name='도시명')
+    is_active = models.BooleanField(default=True, verbose_name='활성화 여부')
+    order = models.IntegerField(default=0, verbose_name='정렬 순서')
+    
     class Meta:
-        verbose_name = '\ub3c4\uc2dc'
-        verbose_name_plural = '\ub3c4\uc2dc'
+        verbose_name = '도시'
+        verbose_name_plural = '도시'
         ordering = ['order', 'name']
+    
     def __str__(self):
         return self.name

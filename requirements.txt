@@ -27,7 +27,6 @@ django-storages==1.14.2
 Faker==37.3.0
 fastapi==0.115.12
 filelock==3.18.0
-folium==0.19.6
 fsspec==2025.3.2
 future==1.0.0
 grpcio==1.71.0
