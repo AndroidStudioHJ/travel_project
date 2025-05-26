@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     # 사용자 정의 앱
     'accounts.apps.AccountsConfig',
     'travel_input.apps.TravelInputConfig',
-    'map.apps.MapConfig',
     'blog.apps.BlogConfig',
     'image_enhance',
 ]

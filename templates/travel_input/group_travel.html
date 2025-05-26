@@ -254,7 +254,7 @@
         <div class="group-hero-illust"></div>
     </div>
     <div class="create-group">
-        <a href="{% url 'travel_input:group_travel_create' %}" class="create-button">새 그룹 만들기</a>
+        <a href="{% url 'travel:group_travel_create' %}" class="create-button">새 그룹 만들기</a>
     </div>
     <div class="groups-section">
         {% for group in groups %}
@@ -263,7 +263,7 @@
             <p>{{ group.description }}</p>
             <div class="group-info">
                 <span>{{ group.members.count }}명 참여 중</span>
-                <a href="{% url 'travel_input:group_travel_detail' group.pk %}">자세히 보기</a>
+                <a href="{% url 'travel:group_travel_detail' group.pk %}">자세히 보기</a>
             </div>
         </div>
         {% endfor %}

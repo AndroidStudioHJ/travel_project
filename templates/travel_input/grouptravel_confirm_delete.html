@@ -12,7 +12,7 @@
         {% csrf_token %}
         <div class="button-group">
             <button type="submit" class="delete-btn">삭제</button>
-            <a href="{% url 'travel_input:group_travel_detail' object.id %}" class="cancel-btn">취소</a>
+            <a href="{% url 'travel:group_travel_detail' object.id %}" class="cancel-btn">취소</a>
         </div>
     </form>
 </div>

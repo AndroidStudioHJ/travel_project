@@ -10,7 +10,7 @@
     <ul style="list-style: none; padding-left: 0;">
       {% for schedule in schedules %}
         <li style="margin-bottom: 1.5rem; padding: 1rem; background: #ffffff; border-radius: 10px;">
-          <a href="{% url 'travel_input:schedule_detail' schedule.id %}"
+          <a href="{% url 'travel:schedule_detail' schedule.id %}"
              style="font-size: 1.1rem; font-weight: bold; text-decoration: none; color: #007acc;">
             📌 {{ schedule.title }}
           </a><br>
@@ -26,7 +26,7 @@
           </small><br><br>
 
           <!-- ✅ 즐겨찾기 해제 버튼 -->
-          <form action="{% url 'travel_input:toggle_favorite' schedule.id %}" method="post" style="display: inline;">
+          <form action="{% url 'travel:toggle_favorite' schedule.id %}" method="post" style="display: inline;">
             {% csrf_token %}
             <button type="submit" style="background: none; border: none; color: crimson; font-size: 0.9rem; cursor: pointer;">
               즐겨찾기 해제

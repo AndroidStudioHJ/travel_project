@@ -126,6 +126,15 @@
         line-height: 1.6;
     }
 
+    .result-list .blog-url {
+        font-size: 0.9rem;
+        color: #007acc;
+        text-decoration: underline;
+        margin-top: 8px;
+        display: block;
+        word-break: break-all;
+    }
+
     .result-list a {
         font-size: 0.9rem;
         color: #007acc;
@@ -286,18 +295,18 @@
     <div id="all-results" class="result-content active">
         <ul class="result-list">
             {% for post in displayed_posts %}
-            <li>
+            <li class="result-item sentiment-{{ post.sentiment|lower }}">
                 <h4>{{ post.title }}</h4>
-                <p>{{ post.date }}</p>
-                <p>{{ post.summary }}</p>
+                <p style="font-size: 0.85rem; color: #777;">{{ post.date }}</p>
+                <div class="blog-content" id="blog-content-{{ forloop.counter }}">{{ post.content|safe }}</div>
+                <a href="{{ post.link }}" class="blog-url" target="_blank">{{ post.link }}</a>
+
                 <div class="sentiment-counts">
                     <span class="positive-count">긍정 단어: {{ post.positive_count }}회</span>
                     <span class="negative-count">부정 단어: {{ post.negative_count }}회</span>
                 </div>
-                <span class="content-toggle" onclick="toggleContent(this)">본문 보기 ▼</span>
-                <div class="blog-content" style="display: none;">
-                    {{ post.content }}
-                </div>
+
+                <a href="#" class="content-toggle" data-target="#blog-content-{{ forloop.counter }}">본문 보기</a>
                 <a href="{{ post.link }}" target="_blank">원문 보기</a>
             </li>
             {% empty %}
@@ -311,18 +320,18 @@
         <ul class="result-list">
             {% for post in displayed_posts %}
             {% if post.positive_count > post.negative_count %}
-            <li>
+            <li class="result-item sentiment-{{ post.sentiment|lower }}">
                 <h4>{{ post.title }}</h4>
-                <p>{{ post.date }}</p>
-                <p>{{ post.summary }}</p>
+                <p style="font-size: 0.85rem; color: #777;">{{ post.date }}</p>
+                <div class="blog-content" id="blog-content-{{ forloop.counter }}">{{ post.content|safe }}</div>
+                <a href="{{ post.link }}" class="blog-url" target="_blank">{{ post.link }}</a>
+
                 <div class="sentiment-counts">
                     <span class="positive-count">긍정 단어: {{ post.positive_count }}회</span>
                     <span class="negative-count">부정 단어: {{ post.negative_count }}회</span>
                 </div>
-                <span class="content-toggle" onclick="toggleContent(this)">본문 보기 ▼</span>
-                <div class="blog-content" style="display: none;">
-                    {{ post.content }}
-                </div>
+
+                <a href="#" class="content-toggle" data-target="#blog-content-{{ forloop.counter }}">본문 보기</a>
                 <a href="{{ post.link }}" target="_blank">원문 보기</a>
             </li>
             {% endif %}
@@ -337,18 +346,18 @@
         <ul class="result-list">
             {% for post in displayed_posts %}
             {% if post.positive_count == post.negative_count %}
-            <li>
+            <li class="result-item sentiment-{{ post.sentiment|lower }}">
                 <h4>{{ post.title }}</h4>
-                <p>{{ post.date }}</p>
-                <p>{{ post.summary }}</p>
+                <p style="font-size: 0.85rem; color: #777;">{{ post.date }}</p>
+                <div class="blog-content" id="blog-content-{{ forloop.counter }}">{{ post.content|safe }}</div>
+                <a href="{{ post.link }}" class="blog-url" target="_blank">{{ post.link }}</a>
+
                 <div class="sentiment-counts">
                     <span class="positive-count">긍정 단어: {{ post.positive_count }}회</span>
                     <span class="negative-count">부정 단어: {{ post.negative_count }}회</span>
                 </div>
-                <span class="content-toggle" onclick="toggleContent(this)">본문 보기 ▼</span>
-                <div class="blog-content" style="display: none;">
-                    {{ post.content }}
-                </div>
+
+                <a href="#" class="content-toggle" data-target="#blog-content-{{ forloop.counter }}">본문 보기</a>
                 <a href="{{ post.link }}" target="_blank">원문 보기</a>
             </li>
             {% endif %}
@@ -363,18 +372,18 @@
         <ul class="result-list">
             {% for post in displayed_posts %}
             {% if post.negative_count > post.positive_count %}
-            <li>
+            <li class="result-item sentiment-{{ post.sentiment|lower }}">
                 <h4>{{ post.title }}</h4>
-                <p>{{ post.date }}</p>
-                <p>{{ post.summary }}</p>
+                <p style="font-size: 0.85rem; color: #777;">{{ post.date }}</p>
+                <div class="blog-content" id="blog-content-{{ forloop.counter }}">{{ post.content|safe }}</div>
+                <a href="{{ post.link }}" class="blog-url" target="_blank">{{ post.link }}</a>
+
                 <div class="sentiment-counts">
                     <span class="positive-count">긍정 단어: {{ post.positive_count }}회</span>
                     <span class="negative-count">부정 단어: {{ post.negative_count }}회</span>
                 </div>
-                <span class="content-toggle" onclick="toggleContent(this)">본문 보기 ▼</span>
-                <div class="blog-content" style="display: none;">
-                    {{ post.content }}
-                </div>
+
+                <a href="#" class="content-toggle" data-target="#blog-content-{{ forloop.counter }}">본문 보기</a>
                 <a href="{{ post.link }}" target="_blank">원문 보기</a>
             </li>
             {% endif %}

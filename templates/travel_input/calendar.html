@@ -27,7 +27,7 @@
     const calendar = new FullCalendar.Calendar(calendarEl, {
       initialView: 'dayGridMonth',
       locale: 'ko',
-      events: '{% url "travel_input:calendar_events" %}',
+      events: '{% url "travel:calendar_events" %}',
       eventClick: function(info) {
         window.location.href = info.event.url;
       }

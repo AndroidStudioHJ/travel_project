@@ -21,7 +21,7 @@ from .views import (
     api_schedules,
 )
 
-app_name = 'travel_input'
+app_name = 'travel'
 
 urlpatterns = [
     # 🏠 기본 홈

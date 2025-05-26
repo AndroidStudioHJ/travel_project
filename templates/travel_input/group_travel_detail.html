@@ -232,14 +232,14 @@
         <div class="group-title">{{ group.name }}</div>
         <div class="group-actions">
             {% if is_admin %}
-            <a href="{% url 'travel_input:group_travel_update' group.pk %}" class="btn btn-outline-primary">
+            <a href="{% url 'travel:group_travel_update' group.pk %}" class="btn btn-outline-primary">
                 <i class="fas fa-edit"></i> 수정
             </a>
-            <a href="{% url 'travel_input:group_travel_delete' group.pk %}" class="btn btn-outline-danger">
+            <a href="{% url 'travel:group_travel_delete' group.pk %}" class="btn btn-outline-danger">
                 <i class="fas fa-trash"></i> 삭제
             </a>
             {% endif %}
-            <a href="{% url 'travel_input:group_travel_list' %}" class="btn btn-outline-secondary">
+            <a href="{% url 'travel:group_travel_list' %}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left"></i> 목록으로
             </a>
         </div>
@@ -312,7 +312,7 @@
             e.preventDefault();
             const content = messageInput.value.trim();
             if (content) {
-                fetch('{% url "travel_input:send_message" group.pk %}', {
+                fetch('{% url "travel:send_message" group.pk %}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',

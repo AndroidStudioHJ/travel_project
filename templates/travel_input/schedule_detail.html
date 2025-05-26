@@ -79,9 +79,9 @@
 
     <!-- 버튼 -->
     <div class="text-center mt-4">
-      <a href="{% url 'travel_input:schedule_update' schedule.pk %}" class="btn btn-primary">수정</a>
-      <a href="{% url 'travel_input:schedule_delete' schedule.pk %}" class="btn btn-danger">삭제</a>
-      <a href="{% url 'travel_input:schedule_list' %}" class="btn btn-secondary">목록으로</a>
+      <a href="{% url 'travel:schedule_update' schedule.pk %}" class="btn btn-primary">수정</a>
+      <a href="{% url 'travel:schedule_delete' schedule.pk %}" class="btn btn-danger">삭제</a>
+      <a href="{% url 'travel:schedule_list' %}" class="btn btn-secondary">목록으로</a>
     </div>
   </div>
 </div>
