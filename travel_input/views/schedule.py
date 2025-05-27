@@ -20,53 +20,25 @@ def schedule_create(request):
             schedule.user = request.user
             schedule.save()
             form.save_m2m()  # ✅ ManyToManyField 저장
-
-            # ✅ 카테고리별 프롬프트 조립
-            purposes = [p.name for p in schedule.travel_purpose.all()]
-            styles = [s.name for s in schedule.travel_style.all()]
-            factors = [f.name for f in schedule.important_factors.all()]
-
-            purpose_text = f"이 여행은 {', '.join(purposes)}을(를) 목적으로 합니다." if purposes else ""
-            style_text = f"여행 스타일은 {', '.join(styles)}을(를) 선호합니다." if styles else ""
-            factor_text = f"특히 {', '.join(factors)}에 중점을 두고 싶습니다." if factors else ""
-
-            # ✅ 프롬프트 최종 조립
-            prompt = f"""
-당신은 여행 일정 전문가입니다. 다음 정보를 바탕으로 여행 계획을 구성해 주세요.
-
-- 여행 제목: {schedule.title}
-- 여행지: {schedule.destination}
-- 여행 날짜: {schedule.start_date} ~ {schedule.end_date}
-{purpose_text}
-{style_text}
-{factor_text}
-- 메모(특이사항): {schedule.notes or '없음'}
-
-각 날짜별로 추천 일정과 장소, 활동을 포함해 주세요.
-""".strip()
-
+            # OpenAI 일정 생성 요청
             try:
                 client = OpenAI(api_key=settings.OPENAI_API_KEY)
+                prompt = f"""아래 여행 정보를 바탕으로 여행 일정을 표 형식으로 설계해 주세요.\n\n- 제목: {schedule.title}\n- 여행지: {schedule.destination}\n- 기간: {schedule.start_date} ~ {schedule.end_date}\n- 여행 목적: {', '.join([p.name for p in schedule.travel_purpose.all()])}\n- 여행 스타일: {', '.join([s.name for s in schedule.travel_style.all()])}\n- 중요 요소: {', '.join([f.name for f in schedule.important_factors.all()])}\n- 메모: {schedule.notes or ''}\n"""
                 response = client.chat.completions.create(
-                    model="gpt-4",
+                    model="gpt-3.5-turbo",
                     messages=[
-                        {"role": "system", "content": "당신은 여행 일정 전문가입니다."},
+                        {"role": "system", "content": "당신은 여행 일정 설계 전문가입니다."},
                         {"role": "user", "content": prompt}
                     ],
                     max_tokens=800,
                     temperature=0.7,
                 )
-                ai_answer = response.choices[0].message.content.strip()
-                schedule.ai_response = ai_answer
+                schedule.ai_response = response.choices[0].message.content.strip()
                 schedule.save()
             except Exception as e:
-                ai_answer = f"AI 응답 오류: {str(e)}"
-
-            return render(request, 'travel_input/schedule_detail.html', {
-                'schedule': schedule,
-                'ai_answer': ai_answer,
-            })
-
+                schedule.ai_response = f"AI 일정 생성 오류: {str(e)}"
+                schedule.save()
+            return redirect('travel:schedule_detail', pk=schedule.pk)
     else:
         form = ScheduleForm()
 
@@ -180,7 +152,7 @@ def schedule_update(request, pk):
         form = ScheduleForm(request.POST, instance=schedule)
         if form.is_valid():
             schedule = form.save()
-            return redirect('travel_input:schedule_detail', pk=schedule.pk)
+            return redirect('travel:schedule_detail', pk=schedule.pk)
     else:
         form = ScheduleForm(instance=schedule)
     return render(request, 'travel_input/schedule_form.html', {'form': form})
@@ -191,7 +163,7 @@ def schedule_delete(request, pk):
     if request.method == 'POST':
         schedule.delete()
         messages.success(request, '일정이 삭제되었습니다.')
-        return redirect('travel_input:schedule_list')
+        return redirect('travel:schedule_list')
     return render(request, 'travel_input/schedule_confirm_delete.html', {'schedule': schedule})
 
 @login_required
@@ -199,7 +171,7 @@ def confirm_delete_all(request):
     if request.method == 'POST':
         Schedule.objects.filter(user=request.user).delete()
         messages.success(request, '모든 일정이 삭제되었습니다.')
-        return redirect('travel_input:schedule_list')
+        return redirect('travel:schedule_list')
     return render(request, 'travel_input/schedule_confirm_delete_all.html')
 
 @login_required

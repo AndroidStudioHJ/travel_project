@@ -46,34 +46,46 @@
       </ul>
     </div>
 
+    <!-- AI 여행계획 섹션 -->
+    <div class="ai-feedback-section">
+      <h2 class="section-title">AI 여행계획</h2>
+      {% if schedule.ai_feedback_response %}
+        <div class="ai-answer">
+          <strong>AI 개선 제안:</strong><br>
+          {{ schedule.ai_feedback_response|linebreaksbr }}
+        </div>
+      {% endif %}
+      <form method="post" action="" class="ai-feedback-form">
+        {% csrf_token %}
+        <input type="hidden" name="submit_feedback" value="1">
+        <textarea name="user_feedback" class="form-control" rows="3" placeholder="이 일정에 대한 개선 의견을 입력해 주세요.">{{ schedule.user_feedback }}</textarea>
+        <button type="submit" class="btn btn-outline-primary" id="submitFeedbackBtn">
+          <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+          <span class="btn-text">AI에게 개선 요청</span>
+        </button>
+      </form>
+    </div>
+
     <!-- AI 생성 일정 -->
     <div class="section-title">AI 생성 여행 일정</div>
-    {% if ai_answer %}
-      <div class="ai-answer">{{ ai_answer|linebreaksbr }}</div>
-    {% else %}
-      <p>AI 여행 일정이 없습니다.</p>
-    {% endif %}
-
-    {% if ai_intro_text %}
-      <div class="ai-intro-text">
-          <span>핵심 키워드: {{ ai_intro_text }}</span>
-          <a href="{% url 'blog:sentiment_analysis' %}?query={{ ai_intro_text|urlencode }}" class="btn btn-sm btn-secondary ms-3">블로그 감성 분석</a>
+    {% if ai_answer and not request.POST.question_submit %}
+      <div class="ai-answer-text" style="background: #fff; padding: 20px; border-radius: 8px; margin-bottom: 30px; font-size: 1.1rem; line-height: 1.7;">
+        {{ ai_answer|linebreaksbr }}
       </div>
     {% endif %}
-
-    <!-- 사용자 피드백 -->
-    <div class="section-title mt-5">AI 일정 개선 요청</div>
-    <form method="post" action="" class="ai-feedback-form">
+    <form method="post" action="" class="ai-question-form" style="margin-bottom: 30px; display: flex; gap: 10px; align-items: flex-start;">
       {% csrf_token %}
-      <input type="hidden" name="submit_feedback" value="1">
-          <textarea name="user_feedback" class="form-control me-2" rows="3" placeholder="이 일정에 대한 개선 의견을 입력해 주세요.">{{ schedule.user_feedback }}</textarea>
-          <button type="submit" class="btn btn-outline-primary">AI에게 개선 요청</button>
+      <input type="hidden" name="question_submit" value="1">
+      <textarea name="question" class="form-control" rows="2" placeholder="AI에게 일정 관련 질문을 입력하세요." style="flex:1;"></textarea>
+      <button type="submit" class="btn btn-outline-success mt-2 ai-question-btn" style="min-width:160px; transition: background 0.2s, color 0.2s;">
+        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+        <span class="btn-text">AI에게 일정 생성/질문 요청</span>
+      </button>
     </form>
-
-    {% if schedule.ai_feedback_response %}
-      <div class="ai-answer mt-3">
-        <strong>AI 개선 제안:</strong><br>
-        {{ schedule.ai_feedback_response|linebreaksbr }}
+    {% if ai_answer and request.POST.question_submit %}
+      <div class="ai-question-result" style="background: #e8f5e9; padding: 20px; border-radius: 8px; margin-bottom: 30px; font-size: 1.05rem; line-height: 1.7; border: 1.5px solid #43a047;">
+        <strong>AI 답변:</strong><br>
+        {{ ai_answer|linebreaksbr }}
       </div>
     {% endif %}
 
@@ -101,6 +113,39 @@ document.addEventListener('DOMContentLoaded', function() {
             form.submit(); // 폼 제출
         }
     });
+
+    // AI 질문 폼 처리 및 버튼 효과
+    const aiQuestionForm = document.querySelector('form.ai-question-form');
+    if (aiQuestionForm) {
+        const aiBtn = aiQuestionForm.querySelector('button.ai-question-btn');
+        const spinner = aiBtn.querySelector('.spinner-border');
+        const btnText = aiBtn.querySelector('.btn-text');
+        aiQuestionForm.addEventListener('submit', function(event) {
+            const textarea = aiQuestionForm.querySelector('textarea[name="question"]');
+            if (!textarea.value.trim()) {
+                event.preventDefault();
+                textarea.focus();
+                return false;
+            }
+            // 버튼 클릭 효과 및 처리중 표시
+            aiBtn.disabled = true;
+            aiBtn.classList.add('active');
+            spinner.classList.remove('d-none');
+            btnText.textContent = '처리 중...';
+        });
+        aiBtn.addEventListener('mousedown', function() {
+            aiBtn.style.backgroundColor = '#218838';
+            aiBtn.style.color = '#fff';
+        });
+        aiBtn.addEventListener('mouseup', function() {
+            aiBtn.style.backgroundColor = '';
+            aiBtn.style.color = '';
+        });
+        aiBtn.addEventListener('mouseleave', function() {
+            aiBtn.style.backgroundColor = '';
+            aiBtn.style.color = '';
+        });
+    }
 });
 </script>
 {% endblock %}
