@@ -133,3 +133,4 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 # 🔐 네이버 클라이언트 ID와 시크릿
 NAVER_CLIENT_ID = os.getenv('NAVER_CLIENT_ID')  # 환경 변수로 이동
 NAVER_CLIENT_SECRET = os.getenv('NAVER_CLIENT_SECRET')  # 환경 변수로 이동
+

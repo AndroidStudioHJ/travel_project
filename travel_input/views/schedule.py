@@ -10,6 +10,7 @@ from django.conf import settings
 
 from travel_input.forms import ScheduleForm
 from travel_input.models import Schedule, Destination
+from .utils import naver_search_blog, summarize_with_openai
 
 @login_required
 def schedule_create(request):
@@ -39,6 +40,7 @@ def schedule_create(request):
                 schedule.ai_response = f"AI 일정 생성 오류: {str(e)}"
                 schedule.save()
             return redirect('travel:schedule_detail', pk=schedule.pk)
+
     else:
         form = ScheduleForm()
 
@@ -70,14 +72,11 @@ def schedule_detail(request, pk):
     ai_answer = None
     ai_intro_text = None
 
+    # --- 기존 AI 키워드/피드백/질문 처리 ---
     if schedule.ai_response:
         try:
             client = OpenAI(api_key=settings.OPENAI_API_KEY)
-            prompt = f"""다음 여행 일정 설명의 핵심 키워드 하나만 간결하게 요약해 주세요:
-
-{schedule.ai_response}
-
-핵심 키워드:"""
+            prompt = f"""다음 여행 일정 설명의 핵심 키워드 하나만 간결하게 요약해 주세요:\n\n{schedule.ai_response}\n\n핵심 키워드:"""
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
