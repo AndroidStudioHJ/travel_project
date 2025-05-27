@@ -28,7 +28,7 @@ if nafnet_path not in sys.path:
 # 🔐 보안 설정
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "임시비상용_시크릿_키")
 DEBUG = True
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 # 📦 앱 등록
 INSTALLED_APPS = [
@@ -131,5 +131,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # 🔐 네이버 클라이언트 ID와 시크릿
-NAVER_CLIENT_ID = '1YBH7OvMFZtH79n3SC10'
-NAVER_CLIENT_SECRET = 'wQiposerk2'
+NAVER_CLIENT_ID = os.getenv('NAVER_CLIENT_ID')  # 환경 변수로 이동
+NAVER_CLIENT_SECRET = os.getenv('NAVER_CLIENT_SECRET')  # 환경 변수로 이동
+

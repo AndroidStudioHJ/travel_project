@@ -11,10 +11,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='city',
-            name='slug',
-        ),
+        # migrations.RemoveField(
+        #     model_name='city',
+        #     name='slug',
+        # ),
         migrations.AddField(
             model_name='schedule',
             name='travel_tips',
