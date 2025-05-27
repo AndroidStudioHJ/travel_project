@@ -129,3 +129,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # 🔐 OpenAI API Key (⭐ 반드시 .env에서 불러오세요)
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+# 🔐 네이버 클라이언트 ID와 시크릿
+NAVER_CLIENT_ID = '1YBH7OvMFZtH79n3SC10'
+NAVER_CLIENT_SECRET = 'wQiposerk2'

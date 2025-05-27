@@ -32,47 +32,64 @@ class ImportantFactor(models.Model):
         return self.name
 
 class Schedule(models.Model):
-    title = models.CharField(max_length=200, verbose_name='\uc77c\uc815 \uc81c\ubaa9')
-    destination = models.ForeignKey(Destination, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="\uc5ec\ud589\uc9c0")
-    start_date = models.DateField(verbose_name='\uc2dc\uc791\uc77c')
-    end_date = models.DateField(null=True, blank=True, verbose_name='\uc885\ub8cc\uc77c')
-    budget = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True, verbose_name='\uc608\uc0b0')
-    notes = models.TextField(max_length=5000, null=True, blank=True, verbose_name='\uba54\ubaa8')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='schedules', verbose_name='\uc0ac\uc6a9\uc790')
+    title = models.CharField(max_length=200, verbose_name='일정 제목')
+    destination = models.ForeignKey(Destination, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="여행지")
+    start_date = models.DateField(verbose_name='시작일')
+    end_date = models.DateField(null=True, blank=True, verbose_name='종료일')
+    budget = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True, verbose_name='예산')
+    notes = models.TextField(max_length=5000, null=True, blank=True, verbose_name='메모')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='schedules', verbose_name='사용자')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    favorite = models.BooleanField(default=False, verbose_name='\uc990\uaca8\ucc3e\uae30 \uc720\ubb34')
+    favorite = models.BooleanField(default=False, verbose_name='즐겨찾기 유무')
 
-    travel_purpose = models.ManyToManyField(TravelPurpose, blank=True, verbose_name="\uc5ec\ud589 \ubaa9\uc801")
-    travel_style = models.ManyToManyField(TravelStyle, blank=True, verbose_name="\uc5ec\ud589 \uc2a4\ud0c0\uc77c")
-    important_factors = models.ManyToManyField(ImportantFactor, blank=True, verbose_name="\uc911\uc694 \uc694\uc18c")
+    travel_purpose = models.ManyToManyField(TravelPurpose, blank=True, verbose_name="여행 목적")
+    travel_style = models.ManyToManyField(TravelStyle, blank=True, verbose_name="여행 스타일")
+    important_factors = models.ManyToManyField(ImportantFactor, blank=True, verbose_name="중요 요소")
 
-    participant_info = models.TextField(null=True, blank=True, default='', verbose_name='\ucc38\uac00\uc790')
-    place_info = models.TextField(null=True, blank=True, default='', verbose_name='\ubc29\ubb38 \uc7a5\uc18c')
-    transport_info = models.TextField(null=True, blank=True, default='', verbose_name='\uad50\ud1b5 \uc815\ubcf4')
-    age_group = models.CharField(max_length=50, null=True, blank=True, default='', verbose_name='\uc5f0\ub839\ub300')
-    group_type = models.CharField(max_length=50, null=True, blank=True, default='', verbose_name='\uc5ec\ud589 \ub3d9\ud589 \ud615\ud0dc')
-    preferred_activities = models.TextField(null=True, blank=True, default='', verbose_name='\uc120\ud638 \ud65c\ub3d9')
-    meal_preference = models.TextField(null=True, blank=True, default='', verbose_name='\uc74c\uc2dd \uc120\ud638')
-    language_support = models.BooleanField(default=False, verbose_name='\uc5b8\uc5b4 \uc9c0\uc6d0 \ud544\uc694')
-    season = models.CharField(max_length=50, null=True, blank=True, default='', verbose_name='\ud76c\ub9dd \uacc4\uc808')
-    repeat_visitor = models.BooleanField(default=False, verbose_name='\uc7ac\ubc29\ubb38 \uc720\ubb34')
-    mobility_needs = models.TextField(null=True, blank=True, default='', verbose_name='\uc774\ub3d9 \uad00\ub828 \uc694\uad6c')
-    event_interest = models.BooleanField(default=False, verbose_name='\ud604\uc9c0 \uc774\ubca4\ud2b8/\ucd95\uc81c \uad00\uc2ec')
-    travel_insurance = models.BooleanField(default=False, verbose_name='\uc5ec\ud589\uc790 \ubcf4\ud5d8 \uac00\uc785')
+    participant_info = models.TextField(null=True, blank=True, default='', verbose_name='참가자')
+    place_info = models.TextField(null=True, blank=True, default='', verbose_name='방문 장소')
+    transport_info = models.TextField(null=True, blank=True, default='', verbose_name='교통 정보')
+    age_group = models.CharField(max_length=50, null=True, blank=True, default='', verbose_name='연령대')
+    group_type = models.CharField(max_length=50, null=True, blank=True, default='', verbose_name='여행 동행 형태')
+    preferred_activities = models.TextField(null=True, blank=True, default='', verbose_name='선호 활동')
+    meal_preference = models.TextField(null=True, blank=True, default='', verbose_name='음식 선호')
+    language_support = models.BooleanField(default=False, verbose_name='언어 지원 필요')
+    season = models.CharField(max_length=50, null=True, blank=True, default='', verbose_name='휴가 계절')
+    repeat_visitor = models.BooleanField(default=False, verbose_name='재방문 유무')
+    mobility_needs = models.TextField(null=True, blank=True, default='', verbose_name='이동 관련 요구')
+    event_interest = models.BooleanField(default=False, verbose_name='현지 이벤트/축제 관심')
+    travel_insurance = models.BooleanField(default=False, verbose_name='여행자 보험 가입')
 
-    ai_response = models.TextField(null=True, blank=True, verbose_name='AI \uc0dd\uc131 \uacb0\uacfc')
-    user_feedback = models.TextField(null=True, blank=True, verbose_name='\uc0ac\uc6a9\uc790 \ud53c\ub4dc\ub9bd')
-    ai_feedback_response = models.TextField(null=True, blank=True, verbose_name='AI \uac1c\uc804 \uc81c\uc548')
+    ai_response = models.TextField(null=True, blank=True, verbose_name='AI 생성 결과')
+    user_feedback = models.TextField(null=True, blank=True, verbose_name='사용자 피드백')
+    ai_feedback_response = models.TextField(null=True, blank=True, verbose_name='AI 개선 제안')
+    travel_tips = models.TextField(null=True, blank=True, verbose_name='여행 준비 팁')
 
     class Meta:
         ordering = ['-created_at', '-start_date']
-        verbose_name = '\uc5ec\ud589 \uc77c\uc815'
-        verbose_name_plural = '\uc5ec\ud589 \uc77c\uc815\ub4e4'
+        verbose_name = '여행 일정'
+        verbose_name_plural = '여행 일정들'
 
     def __str__(self):
         return f"{self.title} - {self.destination} ({self.start_date})"
+
+class RecommendedPlace(models.Model):
+    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, related_name='recommended_places')
+    name = models.CharField(max_length=200, verbose_name='장소명')
+    description = models.TextField(verbose_name='설명')
+    image_url = models.URLField(null=True, blank=True, verbose_name='이미지 URL')
+    map_url = models.URLField(null=True, blank=True, verbose_name='지도 URL')
+    order = models.IntegerField(default=0, verbose_name='정렬 순서')
+
+    class Meta:
+        ordering = ['order', 'name']
+        verbose_name = '추천 장소'
+        verbose_name_plural = '추천 장소들'
+
+    def __str__(self):
+        return f"{self.name} ({self.schedule.title})"
 
 class Budget(models.Model):
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, related_name='budgets')
