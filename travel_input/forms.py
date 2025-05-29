@@ -34,6 +34,7 @@ class ScheduleForm(forms.ModelForm):
         model = Schedule
         fields = [
             'title', 'destination', 'start_date', 'end_date',
+            'start_time', 'end_time',
             'travel_purpose', 'travel_style', 'important_factors',
             'specific_places',
         ]

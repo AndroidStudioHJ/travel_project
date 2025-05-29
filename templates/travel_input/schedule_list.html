@@ -198,8 +198,8 @@ document.addEventListener('DOMContentLoaded', function() {
     var events = scheduleData.map(function(schedule) {
         return {
             title: schedule.title,
-            start: schedule.start_date,
-            end: schedule.end_date,
+            start: schedule.start,
+            end: schedule.end,
             url: '/travel/schedule/' + schedule.id + '/'
         }
     });
@@ -269,6 +269,8 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="schedule-info">
                 <p>여행지: {{ schedule.destination }}</p>
                 <p>여행 예정일: {{ schedule.start_date|date:"Y.m.d" }}</p>
+                <p>시작 시간: {{ schedule.start_time|date:"H:i" }}</p>
+                <p>종료 시간: {{ schedule.end_time|date:"H:i" }}</p>
                 {% if schedule.days_left is not None %}
                 <p>{% if schedule.days_left >= 0 %}🕗 D-{{ schedule.days_left }}{% else %}종료됨{% endif %}</p>
                 {% endif %}

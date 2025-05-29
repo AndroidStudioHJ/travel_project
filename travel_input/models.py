@@ -36,6 +36,8 @@ class Schedule(models.Model):
     destination = models.ForeignKey(Destination, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="여행지")
     start_date = models.DateField(verbose_name='시작일')
     end_date = models.DateField(null=True, blank=True, verbose_name='종료일')
+    start_time = models.TimeField(null=True, blank=True, verbose_name='시작 시간')
+    end_time = models.TimeField(null=True, blank=True, verbose_name='종료 시간')
     budget = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True, verbose_name='예산')
     notes = models.TextField(max_length=5000, null=True, blank=True, verbose_name='메모')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='schedules', verbose_name='사용자')

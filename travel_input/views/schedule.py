@@ -20,12 +20,33 @@ def schedule_create(request):
         if form.is_valid():
             schedule = form.save(commit=False)
             schedule.user = request.user
+            # 시간 정보 저장 추가
+            schedule.start_time = form.cleaned_data.get('start_time')
+            schedule.end_time = form.cleaned_data.get('end_time')
             schedule.save()
             form.save_m2m()  # ✅ ManyToManyField 저장
             # OpenAI 일정 생성 요청
             try:
                 client = OpenAI(api_key=settings.OPENAI_API_KEY)
-                prompt = f"""아래 여행 정보를 바탕으로 여행 일정을 마크다운 표 형식으로 설계해 주세요.\n\n- 제목: {schedule.title}\n- 여행지: {schedule.destination}\n- 기간: {schedule.start_date} ~ {schedule.end_date}\n- 여행 목적: {', '.join([p.name for p in schedule.travel_purpose.all()])}\n- 여행 스타일: {', '.join([s.name for s in schedule.travel_style.all()])}\n- 중요 요소: {', '.join([f.name for f in schedule.important_factors.all()])}\n- 메모: {schedule.notes or ''}\n"""
+                prompt = f"""
+아래 여행 정보를 바탕으로 여행 일정을 마크다운 표 형식으로 상세하게 설계해 주세요.
+
+표는 다음 열을 포함해야 합니다: "날짜", "활동", "숙박", "비고". 각 열의 내용을 관련 정보로 채워주세요.
+"비고" 열에는 제공된 "메모" 정보를 활용하여 해당 활동과 관련된 특이사항이나 추가 정보를 간결하게 기재해 주세요. 관련 정보가 없으면 비워두세요.
+
+예시:
+| 날짜       | 활동         | 숙박         | 비고           |
+|------------|--------------|--------------|----------------|
+| YYYY-MM-DD | 예시 활동 내용 | 예시 숙박 정보 | 예시 비고 내용 |
+
+- 제목: {schedule.title}
+- 여행지: {schedule.destination}
+- 기간: {schedule.start_date} ~ {schedule.end_date}
+- 여행 목적: {', '.join([p.name for p in schedule.travel_purpose.all()])}
+- 여행 스타일: {', '.join([s.name for s in schedule.travel_style.all()])}
+- 중요 요소: {', '.join([f.name for f in schedule.important_factors.all()])}
+- 메모: {schedule.notes or ''}
+"""
                 response = client.chat.completions.create(
                     model="gpt-3.5-turbo",
                     messages=[
@@ -52,15 +73,28 @@ def schedule_create(request):
 @login_required
 def schedule_list(request):
     schedules = Schedule.objects.filter(user=request.user).order_by('-created_at')
-    schedules_calendar = [
-        {
-            "id": s.id,
-            "title": s.title,
-            "start_date": s.start_date.isoformat() if s.start_date else None,
-            "end_date": s.end_date.isoformat() if s.end_date else None,
-        }
-        for s in schedules if s.start_date and s.end_date and s.title
-    ]
+    schedules_calendar = []
+    for s in schedules:
+        if s.start_date and s.title:
+            # 시작 시간이 있는 경우 ISO 형식으로 변환, 없는 경우 기본값 사용
+            start_time_str = s.start_time.strftime('%H:%M:%S') if s.start_time else '00:00:00'
+            # 종료 시간이 있는 경우 ISO 형식으로 변환, 없는 경우 기본값 사용
+            end_time_str = s.end_time.strftime('%H:%M:%S') if s.end_time else '23:59:59'
+
+            # 시작 날짜와 시간을 결합
+            start_datetime_str = f"{s.start_date.isoformat()}T{start_time_str}"
+
+            # 종료 날짜와 시간을 결합 (종료 날짜가 없으면 시작 날짜 사용)
+            end_date = s.end_date if s.end_date else s.start_date
+            end_datetime_str = f"{end_date.isoformat()}T{end_time_str}"
+
+            schedules_calendar.append({
+                "id": s.id,
+                "title": s.title,
+                "start": start_datetime_str,
+                "end": end_datetime_str,
+            })
+
     return render(request, 'travel_input/schedule_list.html', {
         'schedules': schedules,
         'schedules_calendar': schedules_calendar,
@@ -69,8 +103,6 @@ def schedule_list(request):
 
 @login_required
 def schedule_detail(request, pk):
-    # --- 함수 진입 확인 디버깅 코드 추가 ---
-    # --- 디버깅 코드 종료 ---
 
     schedule = get_object_or_404(Schedule, pk=pk, user=request.user)
     ai_answer = None
@@ -99,12 +131,7 @@ def schedule_detail(request, pk):
         ai_answer = "AI 일정이 생성되지 않았습니다."
 
     if request.method == 'POST':
-        # --- POST 요청 진입 확인 디버깅 코드 추가 ---
-        # --- 디버깅 코드 종료 ---
-
         if 'question' in request.POST:
-            # --- AI 질문 처리 블록 진입 확인 디버깅 코드 추가 ---
-            # --- 디버깅 코드 종료 ---
             question = request.POST.get('question', '').strip()
             if question:
                 try:
@@ -121,10 +148,6 @@ def schedule_detail(request, pk):
                     )
                     ai_answer_text = response.choices[0].message.content.strip()
 
-                    # --- AI 응답 원본 내용 (디버깅) ---
-                    # --- 디버깅 코드 종료 ---
-
-                    messages.success(request, ai_answer_text) # 응답 메시지 추가
 
                     # Q&A 기록에 추가
                     if schedule.qa_history is None:
@@ -133,8 +156,7 @@ def schedule_detail(request, pk):
                     schedule.save()
 
                 except Exception as e:
-                    # --- AI 응답 오류 디버깅 코드 추가 ---
-                    # --- 디버깅 코드 종료 ---
+                    
                     messages.error(request, f"AI 응답 오류: {str(e)}")
 
             # POST 요청 처리 후 리다이렉트
@@ -173,11 +195,6 @@ def schedule_detail(request, pk):
         # 마크다운 테이블 확장 기능 활성화
         rendered_ai_response = markdown.markdown(schedule.ai_response, extensions=['tables'])
 
-        # --- 변환된 HTML 디버깅 코드 (이제 제거해도 좋습니다) ---
-        # print("--- rendered_ai_response (HTML 변환 결과) ---")
-        # print(rendered_ai_response)
-        # print("----------------------------------------------")
-        # --- 디버깅 코드 종료 ---
 
     return render(request, 'travel_input/schedule_detail.html', {
         'schedule': schedule,
@@ -196,7 +213,11 @@ def schedule_update(request, pk):
     if request.method == 'POST':
         form = ScheduleForm(request.POST, instance=schedule)
         if form.is_valid():
-            schedule = form.save()
+            schedule = form.save(commit=False) # commit=False로 인스턴스만 가져옴
+            # 시간 정보 업데이트 추가
+            schedule.start_time = form.cleaned_data.get('start_time')
+            schedule.end_time = form.cleaned_data.get('end_time')
+            schedule.save() # 변경사항 저장
             return redirect('travel:schedule_detail', pk=schedule.pk)
     else:
         form = ScheduleForm(instance=schedule)
@@ -240,12 +261,27 @@ def calendar_events(request):
     schedules = Schedule.objects.filter(user=request.user)
     events = []
     for s in schedules:
-        events.append({
-            'title': s.title,
-            'start': s.start_date.isoformat(),
-            'end': s.end_date.isoformat() if s.end_date else s.start_date.isoformat(),
-            'url': f'/travel/schedule/{s.id}/'
-        })
+        # 캘린더에 표시할 일정은 시작일과 제목이 있어야 함
+        if s.start_date and s.title:
+            # 시작 시간이 있는 경우 ISO 형식으로 변환, 없는 경우 날짜만 사용
+            start_time = s.start_time.strftime('%H:%M:%S') if s.start_time else '00:00:00'
+            end_time = s.end_time.strftime('%H:%M:%S') if s.end_time else '23:59:59'
+            
+            # 시작 날짜와 시간을 결합
+            start_datetime = f"{s.start_date.isoformat()}T{start_time}"
+            
+            # 종료 날짜와 시간을 결합 (종료 날짜가 없으면 시작 날짜 사용)
+            end_date = s.end_date if s.end_date else s.start_date
+            end_datetime = f"{end_date.isoformat()}T{end_time}"
+            
+            events.append({
+                "id": s.id,
+                "title": s.title,
+                "start": start_datetime,
+                "end": end_datetime,
+                'url': f'/travel/schedule/{s.id}/'
+            })
+
     return JsonResponse(events, safe=False)
 
 @login_required

@@ -203,6 +203,20 @@
         {{ ai_answer|linebreaksbr }}
       </div>
     {% endif %}
+
+    {# Q&A 기록 표시 #}
+    {% if qa_history %}
+      <div class="section-title" style="margin-top: 30px;">AI 문답 기록</div>
+      <div class="qa-history" style="background: #fff; padding: 20px; border-radius: 8px; margin-bottom: 30px; font-size: 1.05rem; line-height: 1.7;">
+        {% for qa in qa_history %}
+          <div class="qa-item" style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px dashed #eee;">
+            <p><strong>나의 질문:</strong> {{ qa.question|linebreaksbr }}</p>
+            <p style="color: #1976d2;"><strong>AI 답변:</strong> {{ qa.answer|linebreaksbr }}</p>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
     <form method="post" action="" class="ai-question-form" style="margin-bottom: 30px; display: flex; gap: 10px; align-items: flex-start;">
       {% csrf_token %}
       <input type="hidden" name="question_submit" value="1">
