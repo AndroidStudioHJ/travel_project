@@ -7,6 +7,7 @@ import random
 from faker import Faker
 from openai import OpenAI
 from django.conf import settings
+import markdown
 
 from travel_input.forms import ScheduleForm
 from travel_input.models import Schedule, Destination
@@ -24,7 +25,7 @@ def schedule_create(request):
             # OpenAI 일정 생성 요청
             try:
                 client = OpenAI(api_key=settings.OPENAI_API_KEY)
-                prompt = f"""아래 여행 정보를 바탕으로 여행 일정을 표 형식으로 설계해 주세요.\n\n- 제목: {schedule.title}\n- 여행지: {schedule.destination}\n- 기간: {schedule.start_date} ~ {schedule.end_date}\n- 여행 목적: {', '.join([p.name for p in schedule.travel_purpose.all()])}\n- 여행 스타일: {', '.join([s.name for s in schedule.travel_style.all()])}\n- 중요 요소: {', '.join([f.name for f in schedule.important_factors.all()])}\n- 메모: {schedule.notes or ''}\n"""
+                prompt = f"""아래 여행 정보를 바탕으로 여행 일정을 마크다운 표 형식으로 설계해 주세요.\n\n- 제목: {schedule.title}\n- 여행지: {schedule.destination}\n- 기간: {schedule.start_date} ~ {schedule.end_date}\n- 여행 목적: {', '.join([p.name for p in schedule.travel_purpose.all()])}\n- 여행 스타일: {', '.join([s.name for s in schedule.travel_style.all()])}\n- 중요 요소: {', '.join([f.name for f in schedule.important_factors.all()])}\n- 메모: {schedule.notes or ''}\n"""
                 response = client.chat.completions.create(
                     model="gpt-3.5-turbo",
                     messages=[
@@ -68,9 +69,14 @@ def schedule_list(request):
 
 @login_required
 def schedule_detail(request, pk):
+    # --- 함수 진입 확인 디버깅 코드 추가 ---
+    # --- 디버깅 코드 종료 ---
+
     schedule = get_object_or_404(Schedule, pk=pk, user=request.user)
     ai_answer = None
-    ai_intro_text = None
+
+    # 페이지 로드 시 기존 Q&A 기록 불러오기
+    qa_history = schedule.qa_history if schedule.qa_history is not None else []
 
     # --- 기존 AI 키워드/피드백/질문 처리 ---
     if schedule.ai_response:
@@ -86,14 +92,19 @@ def schedule_detail(request, pk):
                 max_tokens=50,
                 temperature=0.3,
             )
-            ai_intro_text = response.choices[0].message.content.strip()
+            ai_answer = response.choices[0].message.content.strip()
         except Exception as e:
-            ai_intro_text = f"키워드 요약 오류: {str(e)}"
+            ai_answer = f"AI 일정 요약 오류: {str(e)}"
     else:
-        ai_intro_text = "AI 일정이 생성되지 않았습니다."
+        ai_answer = "AI 일정이 생성되지 않았습니다."
 
     if request.method == 'POST':
+        # --- POST 요청 진입 확인 디버깅 코드 추가 ---
+        # --- 디버깅 코드 종료 ---
+
         if 'question' in request.POST:
+            # --- AI 질문 처리 블록 진입 확인 디버깅 코드 추가 ---
+            # --- 디버깅 코드 종료 ---
             question = request.POST.get('question', '').strip()
             if question:
                 try:
@@ -108,9 +119,26 @@ def schedule_detail(request, pk):
                         max_tokens=500,
                         temperature=0.7,
                     )
-                    ai_answer = response.choices[0].message.content.strip()
+                    ai_answer_text = response.choices[0].message.content.strip()
+
+                    # --- AI 응답 원본 내용 (디버깅) ---
+                    # --- 디버깅 코드 종료 ---
+
+                    messages.success(request, ai_answer_text) # 응답 메시지 추가
+
+                    # Q&A 기록에 추가
+                    if schedule.qa_history is None:
+                        schedule.qa_history = []
+                    schedule.qa_history.append({'question': question, 'answer': ai_answer_text})
+                    schedule.save()
+
                 except Exception as e:
-                    ai_answer = f"AI 응답 오류: {str(e)}"
+                    # --- AI 응답 오류 디버깅 코드 추가 ---
+                    # --- 디버깅 코드 종료 ---
+                    messages.error(request, f"AI 응답 오류: {str(e)}")
+
+            # POST 요청 처리 후 리다이렉트
+            return redirect('travel:schedule_detail', pk=schedule.pk)
 
         elif 'submit_feedback' in request.POST:
             feedback = request.POST.get('user_feedback', '').strip()
@@ -133,10 +161,28 @@ def schedule_detail(request, pk):
                     schedule.ai_feedback_response = f"AI 피드백 오류: {str(e)}"
             schedule.save()
 
+            # POST 요청 처리 후 리다이렉트
+            return redirect('travel:schedule_detail', pk=schedule.pk)
+
+    # GET 요청 시 또는 POST 처리 후 리다이렉트된 후 템플릿 렌더링
+    # Q&A 기록을 템플릿으로 전달
+
+    # ai_response 필드의 마크다운을 HTML로 렌더링
+    rendered_ai_response = None
+    if schedule.ai_response:
+        # 마크다운 테이블 확장 기능 활성화
+        rendered_ai_response = markdown.markdown(schedule.ai_response, extensions=['tables'])
+
+        # --- 변환된 HTML 디버깅 코드 (이제 제거해도 좋습니다) ---
+        # print("--- rendered_ai_response (HTML 변환 결과) ---")
+        # print(rendered_ai_response)
+        # print("----------------------------------------------")
+        # --- 디버깅 코드 종료 ---
+
     return render(request, 'travel_input/schedule_detail.html', {
         'schedule': schedule,
-        'ai_answer': ai_answer or schedule.ai_response,
-        'ai_intro_text': ai_intro_text,
+        'qa_history': qa_history,
+        'rendered_ai_response': rendered_ai_response
     })
 
 

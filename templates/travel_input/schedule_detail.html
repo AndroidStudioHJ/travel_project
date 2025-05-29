@@ -123,6 +123,27 @@
     .detail-content p {
         margin-bottom: 8px;
     }
+
+    /* AI 생성 일정 테이블 스타일 */
+    .ai-answer-text.markdown-content table {
+        width: 100%;
+        table-layout: auto;
+        border-collapse: collapse;
+    }
+
+    .ai-answer-text.markdown-content th,
+    .ai-answer-text.markdown-content td {
+        white-space: normal;
+        word-wrap: break-word;
+        padding: 8px;
+        border: 1px solid #ddd;
+        vertical-align: top;
+    }
+
+    .ai-answer-text.markdown-content td:first-child,
+    .ai-answer-text.markdown-content th:first-child {
+         min-width: 100px;
+    }
 </style>
 {% endblock %}
 
@@ -154,7 +175,7 @@
           <i class="fas fa-star"></i> 여행 스타일:
           {% for style in schedule.travel_style.all %}
             {{ style.name }}{% if not forloop.last %}, {% endif %}
-          {% empty %}없음{% endfor %}
+            {% empty %}없음{% endfor %}
         </li>
         <li>
           <i class="fas fa-heart"></i> 중요 요소:
@@ -164,31 +185,19 @@
         </li>
       </ul>
     </div>
-
-
-    <!-- AI 여행계획 섹션 -->
-    <div class="ai-feedback-section">
-      <h2 class="section-title">AI 여행계획</h2>
-
-      {% if schedule.ai_feedback_response %}
-        <div class="ai-answer">
-          <strong>AI 개선 제안:</strong><br>
-          {{ schedule.ai_feedback_response|linebreaksbr }}
-        </div>
-      {% endif %}
-      <form method="post" action="" class="ai-feedback-form">
-        {% csrf_token %}
-        <input type="hidden" name="submit_feedback" value="1">
-        <textarea name="user_feedback" class="form-control" rows="3" placeholder="이 일정에 대한 개선 의견을 입력해 주세요.">{{ schedule.user_feedback }}</textarea>
-        <button type="submit" class="btn btn-outline-primary" id="submitFeedbackBtn">
-          <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-          <span class="btn-text">AI에게 개선 요청</span>
-        </button>
-      </form>
-    </div>
-
+    
     <!-- AI 생성 일정 -->
-    <div class="section-title">AI 생성 여행 일정</div>
+    {# 초기 AI 생성 일정 (마크다운) #}
+    {% if rendered_ai_response %}
+      <div class="section-title">AI 생성 여행 일정</div>
+      <div class="ai-answer-text markdown-content" style="background: #fff; padding: 20px; border-radius: 8px; margin-bottom: 30px; font-size: 1.1rem; line-height: 1.7; overflow-x: auto;">
+        {{ rendered_ai_response|safe }}
+      </div>
+    {% endif %}
+
+    {% if schedule.daily_schedule %}
+      <div class="section-title">AI 생성 여행 일정</div>
+    {% endif %}
     {% if ai_answer and not request.POST.question_submit %}
       <div class="ai-answer-text" style="background: #fff; padding: 20px; border-radius: 8px; margin-bottom: 30px; font-size: 1.1rem; line-height: 1.7;">
         {{ ai_answer|linebreaksbr }}
@@ -210,6 +219,28 @@
 
       </div>
     {% endif %}
+    
+    <!-- AI 여행계획 섹션 -->
+    <div class="ai-feedback-section">
+      <h2 class="section-title">AI 여행계획</h2>
+
+      {% if schedule.ai_feedback_response %}
+        <div class="ai-answer">
+          <strong>AI 개선 제안:</strong><br>
+          {{ schedule.ai_feedback_response|linebreaksbr }}
+        </div>
+      {% endif %}
+      <form method="post" action="" class="ai-feedback-form">
+        {% csrf_token %}
+        <input type="hidden" name="submit_feedback" value="1">
+        <textarea name="user_feedback" class="form-control" rows="3" placeholder="이 일정에 대한 개선 의견을 입력해 주세요.">{{ schedule.user_feedback }}</textarea>
+        <button type="submit" class="btn btn-outline-primary" id="submitFeedbackBtn">
+          <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+          <span class="btn-text">AI에게 개선 요청</span>
+        </button>
+      </form>
+    </div>
+
 
     <!-- 버튼 -->
     <div class="text-center mt-4">

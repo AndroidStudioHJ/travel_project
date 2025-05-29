@@ -66,6 +66,7 @@ class Schedule(models.Model):
     user_feedback = models.TextField(null=True, blank=True, verbose_name='사용자 피드백')
     ai_feedback_response = models.TextField(null=True, blank=True, verbose_name='AI 개선 제안')
     travel_tips = models.TextField(null=True, blank=True, verbose_name='여행 준비 팁')
+    qa_history = models.JSONField(null=True, blank=True, default=list, verbose_name='Q&A 기록')
 
     class Meta:
         ordering = ['-created_at', '-start_date']
