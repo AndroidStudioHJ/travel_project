@@ -11,14 +11,14 @@ class DestinationAdmin(admin.ModelAdmin):
 
 @admin.register(Schedule)
 class ScheduleAdmin(admin.ModelAdmin):
-    list_display = ('title', 'destination', 'start_date', 'end_date', 'created_at')
-    list_filter = ('start_date', 'end_date', 'group_type', 'season', 'repeat_visitor', 'event_interest', 'travel_insurance')
-    search_fields = ('title', 'destination__name', 'participant_info', 'place_info')
+    list_display = ('title', 'departure_city', 'destination', 'start_date', 'end_date', 'created_at')
+    list_filter = ('start_date', 'end_date', 'group_type', 'season', 'repeat_visitor', 'event_interest', 'travel_insurance', 'departure_city')
+    search_fields = ('title', 'destination__name', 'departure_city__name', 'participant_info', 'place_info')
     filter_horizontal = ('travel_purpose', 'travel_style', 'important_factors')  # ✅ ManyToMany 체크박스 UI
 
     fieldsets = (
         ('기본 정보', {
-            'fields': ('title', 'destination', 'start_date', 'end_date', 'budget', 'notes')
+            'fields': ('title', 'departure_city', 'destination', 'start_date', 'end_date', 'budget', 'notes')
         }),
         ('카테고리', {
             'fields': ('travel_purpose', 'travel_style', 'important_factors')

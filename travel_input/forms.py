@@ -33,13 +33,14 @@ class ScheduleForm(forms.ModelForm):
     class Meta:
         model = Schedule
         fields = [
-            'title', 'destination', 'start_date', 'end_date',
+            'title', 'departure_city', 'destination', 'start_date', 'end_date',
             'start_time', 'end_time',
             'travel_purpose', 'travel_style', 'important_factors',
             'specific_places',
         ]
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'departure_city': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '출발지를 입력하세요'}),
             'destination': forms.Select(attrs={'class': 'form-control'}),
             'start_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'end_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),

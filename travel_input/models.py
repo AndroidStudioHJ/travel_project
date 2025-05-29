@@ -33,6 +33,7 @@ class ImportantFactor(models.Model):
 
 class Schedule(models.Model):
     title = models.CharField(max_length=200, verbose_name='일정 제목')
+    departure_city = models.ForeignKey('City', on_delete=models.SET_NULL, null=True, blank=True, related_name='departure_schedules', verbose_name='출발지')
     destination = models.ForeignKey(Destination, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="여행지")
     start_date = models.DateField(verbose_name='시작일')
     end_date = models.DateField(null=True, blank=True, verbose_name='종료일')
